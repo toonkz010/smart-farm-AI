@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="th" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Smart Rice Farm Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        soil: { 500: '#8B5A2B', 700: '#5C3A18' },
+                        rice: { 400: '#FCD34D', 500: '#F59E0B' }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Sarabun', sans-serif; overflow-y: auto; -webkit-tap-highlight-color: transparent; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.3); }
+        .dark .glass { background: rgba(31, 41, 55, 0.7); border: 1px solid rgba(255,255,255,0.1); }
+        .checklist-active { border: 2px solid #8B5A2B; background-color: #FFF8F0; }
+        .dark .checklist-active { border: 2px solid #F59E0B; background-color: #452700; }
+        
+        /* Mobile safe area padding for modern phones */
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300 min-h-screen pb-32">
+
+    <!-- Top Navigation -->
+    <nav class="bg-green-600 dark:bg-green-800 text-white p-4 sticky top-0 z-50 shadow-md flex justify-between items-center">
+        <h1 class="text-xl font-bold"><i class="fa-solid fa-seedling mr-2"></i> ผู้ช่วยชาวนาอัจฉริยะ</h1>
+        <button id="darkModeToggle" class="p-2 rounded-full hover:bg-green-700 focus:outline-none">
+            <i class="fa-solid fa-moon text-xl" id="darkIcon"></i>
+        </button>
+    </nav>
+
+    <div class="max-w-md mx-auto p-4 relative">
+        <!-- Plot Selector (Global) -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow mb-4">
+            <label class="block text-sm text-gray-500 dark:text-gray-400 mb-1">เลือกแปลงนาปัจจุบัน</label>
+            <select id="globalPlotSelector" class="w-full border rounded-lg p-2 dark:bg-gray-700 dark:border-gray-600 font-bold text-green-700 dark:text-green-400 text-lg">
+                <option value="1">แปลงนา 1 (นาปี โนนทุ่ง)</option>
+            </select>
+        </div>
+
+        <!-- TAB 1: Dashboard -->
+        <div id="tab-dashboard" class="tab-content active space-y-4">
+            <!-- Weather Widget (Compact) -->
+            <div class="glass rounded-xl p-4 shadow-lg cursor-pointer" onclick="toggleWeatherModal()">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-sm font-bold text-gray-500 dark:text-gray-300">ต.สระทอง จ.บุรีรัมย์</h2>
+                        <div class="flex items-center mt-1">
+                            <i class="fa-solid fa-cloud-sun text-4xl text-yellow-500 mr-3"></i>
+                            <div>
+                                <p class="text-2xl font-bold">32°C</p>
+                                <p class="text-xs text-green-600 dark:text-green-400 font-bold"><i class="fa-solid fa-check-circle"></i> เหมาะสำหรับหว่านปุ๋ย/พ่นยา</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-right text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                        <p><i class="fa-solid fa-wind"></i> ลม 8 กม./ชม.</p>
+                        <p><i class="fa-solid fa-droplet"></i> ชื้น 60%</p>
+                        <p class="text-blue-500 mt-2 underline">ดูล่วงหน้า 7 วัน</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Plot Progress -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <div class="flex justify-between items-center mb-2">
+                    <h2 class="font-bold text-lg">ความคืบหน้าแปลง</h2>
+                    <span class="text-sm bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 px-2 py-1 rounded">กข6 (15 ไร่)</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700 mb-2">
+                    <div class="bg-green-600 h-2.5 rounded-full" style="width: 45%"></div>
+                </div>
+                <p class="text-xs text-gray-500 text-right">อายุข้าว: 45 วัน (ระยะแตกกอ)</p>
+            </div>
+
+            <!-- Up Next -->
+            <div class="bg-red-50 dark:bg-red-900/30 border-l-4 border-red-500 p-4 rounded shadow">
+                <h3 class="font-bold text-red-700 dark:text-red-400"><i class="fa-solid fa-bell"></i> งานเร่งด่วนถัดไป</h3>
+                <p class="text-sm mt-1">ใส่ปุ๋ยบำรุงแตกกอ (46-0-0) จำนวน 225 กก. ภายในวันที่ 20 ต.ค.</p>
+            </div>
+
+            <!-- Smart Checklist -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-bold text-lg">เช็คลิสต์งานประจำแปลง</h2>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-gray-500">Manual</span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="autoMode" class="sr-only peer" checked>
+                            <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all dark:border-gray-600 peer-checked:bg-green-600"></div>
+                        </label>
+                        <span class="text-xs text-green-600 font-bold">Auto</span>
+                    </div>
+                </div>
+
+                <!-- Checklist Items -->
+                <div class="space-y-3">
+                    <!-- Past Task -->
+                    <div class="border rounded p-3 bg-gray-50 dark:bg-gray-700 dark:border-gray-600 opacity-70">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <input type="checkbox" checked disabled class="w-4 h-4 text-green-600 rounded">
+                                <span class="ml-2 text-sm line-through">เตรียมแปลง/ไถดะ (ก่อนหว่าน 15 วัน)</span>
+                            </div>
+                            <span class="text-xs">1 ก.ย.</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Active Task (Brown Highlight) -->
+                    <div class="border checklist-active rounded p-3">
+                        <div class="flex justify-between items-start">
+                            <div class="flex items-start">
+                                <input type="checkbox" class="w-5 h-5 text-soil-500 rounded mt-1">
+                                <div class="ml-2">
+                                    <span class="text-sm font-bold block">ใส่ปุ๋ยรับรวง 15-5-25</span>
+                                    <span class="text-xs text-gray-500">รวม 375 กก. (25 กก./ไร่)</span>
+                                </div>
+                            </div>
+                            <span class="text-xs font-bold text-red-500">วันนี้</span>
+                        </div>
+                    </div>
+
+                    <!-- Future Task (Accordion) -->
+                    <details class="border rounded dark:border-gray-700 bg-white dark:bg-gray-800">
+                        <summary class="p-3 text-sm font-bold cursor-pointer outline-none flex justify-between items-center">
+                            <span>ช่วงออกรวง - เก็บเกี่ยว</span>
+                            <i class="fa-solid fa-chevron-down text-xs"></i>
+                        </summary>
+                        <div class="p-3 border-t dark:border-gray-700 space-y-2">
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="w-4 h-4 rounded">
+                                    <span class="ml-2 text-sm">เฝ้าระวังโรคเมล็ดด่าง</span>
+                                </div>
+                                <span class="text-xs text-gray-500">10 พ.ย.</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <input type="checkbox" class="w-4 h-4 rounded">
+                                    <span class="ml-2 text-sm text-red-600 font-bold">ระบายน้ำออกก่อนเกี่ยว</span>
+                                </div>
+                                <span class="text-xs text-gray-500">20 พ.ย.</span>
+                            </div>
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: Water & Chem -->
+        <div id="tab-water" class="tab-content space-y-4">
+            <h2 class="font-bold text-xl mb-4 border-b pb-2 dark:border-gray-700"><i class="fa-solid fa-droplet text-blue-500"></i> จัดการน้ำ & พ่นยา</h2>
+            
+            <!-- AWD Water -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <h3 class="font-bold mb-3">บันทึกระดับน้ำ (เปียกสลับแห้ง AWD)</h3>
+                <div class="grid grid-cols-3 gap-2 mb-4">
+                    <button class="bg-red-100 text-red-700 dark:bg-red-900/40 border border-red-300 py-2 rounded-lg text-sm font-bold"><i class="fa-solid fa-crack"></i> นาแห้ง</button>
+                    <button class="bg-green-100 text-green-700 dark:bg-green-900/40 border border-green-300 py-2 rounded-lg text-sm font-bold"><i class="fa-solid fa-leaf"></i> ชื้นพอดี</button>
+                    <button class="bg-blue-100 text-blue-700 dark:bg-blue-900/40 border border-blue-300 py-2 rounded-lg text-sm font-bold"><i class="fa-solid fa-water"></i> ขังน้ำ</button>
+                </div>
+                <div class="text-xs text-gray-500">ประวัติล่าสุด: ขังน้ำ 5 ซม. (เมื่อ 2 วันก่อน)</div>
+            </div>
+
+            <!-- Chem & Drone -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <h3 class="font-bold mb-3">บันทึกพ่นยา / ฮอร์โมน</h3>
+                <div class="space-y-3">
+                    <select class="w-full border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <option>ประเภทสารเคมี</option>
+                        <option>ยาคุม/ฆ่าหญ้า (2,4-D, MCPA)</option>
+                        <option>ยาป้องกันเชื้อรา (Isoprothiolane)</option>
+                        <option>ฮอร์โมน/อาหารเสริม</option>
+                        <option>ยาฆ่าแมลง</option>
+                    </select>
+                    <div class="flex space-x-2">
+                        <input type="text" placeholder="ชื่อสามัญ/การค้า" class="w-1/2 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <input type="number" placeholder="ปริมาณ (ซีซี/ไร่)" class="w-1/2 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <label class="flex items-center space-x-2">
+                        <input type="checkbox" class="w-4 h-4 text-blue-600">
+                        <span class="text-sm font-bold"><i class="fa-solid fa-plane-up"></i> ใช้โดรนเกษตร (น้ำน้อย)</span>
+                    </label>
+                    <button class="w-full bg-blue-600 text-white rounded py-2 font-bold mt-2">บันทึกการพ่น</button>
+                </div>
+                <!-- Safety Alert -->
+                <div class="mt-4 bg-yellow-50 dark:bg-yellow-900/30 p-3 rounded border-l-4 border-yellow-500">
+                    <p class="text-xs font-bold text-yellow-700 dark:text-yellow-400">GAP Safety ระยะปลอดภัยก่อนเก็บเกี่ยว</p>
+                    <p class="text-xs mt-1">Isoprothiolane (พ่นล่าสุด 1 ต.ค.) - <span class="text-green-600">ปลอดภัย เก็บเกี่ยวได้</span></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Knowledge -->
+        <div id="tab-knowledge" class="tab-content space-y-4">
+            <h2 class="font-bold text-xl mb-4 border-b pb-2 dark:border-gray-700"><i class="fa-solid fa-book text-soil-500"></i> คลังความรู้ & วิชาวิจัย</h2>
+            
+            <div class="flex overflow-x-auto space-x-2 pb-2 scrollbar-hide">
+                <button class="whitespace-nowrap px-4 py-1 bg-green-600 text-white rounded-full text-sm">วิธีทำนา</button>
+                <button class="whitespace-nowrap px-4 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm">พันธุ์ข้าว</button>
+                <button class="whitespace-nowrap px-4 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm">ฤดูกาล</button>
+                <button class="whitespace-nowrap px-4 py-1 bg-gray-200 dark:bg-gray-700 rounded-full text-sm">ปุ๋ย/ยา</button>
+            </div>
+
+            <div class="space-y-3">
+                <!-- Method 1 -->
+                <details class="bg-white dark:bg-gray-800 rounded-xl shadow group">
+                    <summary class="p-4 font-bold cursor-pointer outline-none list-none flex justify-between items-center">
+                        <div class="flex items-center"><i class="fa-solid fa-seedling text-green-500 mr-2"></i> 1. การคัดเมล็ดและการแช่ (เตรียมหว่าน)</div>
+                        <i class="fa-solid fa-plus text-gray-400 group-open:hidden"></i><i class="fa-solid fa-minus text-gray-400 hidden group-open:block"></i>
+                    </summary>
+                    <div class="p-4 border-t dark:border-gray-700 text-sm space-y-2 text-gray-600 dark:text-gray-300">
+                        <p><strong>การคัดน้ำเกลือ:</strong> ใช้น้ำเกลือความถ่วงจำเพาะ 1.08 (ไข่ไก่ลอยปริ่มน้ำ) เทเมล็ดพันธุ์ลงไป เมล็ดที่ลอยคือเมล็ดลีบ ให้ตักทิ้ง นำเมล็ดที่จมไปล้างน้ำสะอาด 2-3 น้ำ</p>
+                        <p><strong>การแช่และหุ้ม:</strong> แช่น้ำสะอาด 12-24 ชั่วโมง นำขึ้นมาหุ้มกระสอบรักษาความชื้นอีก 24-36 ชั่วโมง จนมี "ตุ่มตา" งอก จึงนำไปหว่าน</p>
+                    </div>
+                </details>
+                
+                <!-- Method 2 -->
+                <details class="bg-white dark:bg-gray-800 rounded-xl shadow group">
+                    <summary class="p-4 font-bold cursor-pointer outline-none list-none flex justify-between items-center">
+                        <div class="flex items-center"><i class="fa-solid fa-spray-can text-blue-500 mr-2"></i> 2. การจัดการวัชพืช (2,4-D, MCPA)</div>
+                        <i class="fa-solid fa-plus text-gray-400 group-open:hidden"></i><i class="fa-solid fa-minus text-gray-400 hidden group-open:block"></i>
+                    </summary>
+                    <div class="p-4 border-t dark:border-gray-700 text-sm space-y-2 text-gray-600 dark:text-gray-300">
+                        <p><strong>2,4-D:</strong> เป็นสารกำจัดวัชพืชใบกว้างและกก นิยมฉีดช่วงข้าวอายุ 20-30 วัน ควรฉีดตอนดินชื้นหรือมีน้ำขังเล็กน้อย</p>
+                        <p><strong>MCPA:</strong> คล้าย 2,4-D แต่อ่อนโยนต่อข้าวมากกว่า นิยมใช้เก็บหญ้าใบกว้างในนาข้าว</p>
+                        <p class="text-red-500 text-xs">*หากใช้โดรน ควรลดปริมาณน้ำตามสัดส่วนที่แนะนำข้างขวด เพื่อป้องกันยาไหม้ใบข้าว</p>
+                    </div>
+                </details>
+
+                <!-- Method 3 -->
+                <details class="bg-white dark:bg-gray-800 rounded-xl shadow group">
+                    <summary class="p-4 font-bold cursor-pointer outline-none list-none flex justify-between items-center">
+                        <div class="flex items-center"><i class="fa-solid fa-sack-dollar text-yellow-500 mr-2"></i> 3. สูตรปุ๋ยมาตรฐาน (16-20-0, 46-0-0, 15-5-25)</div>
+                        <i class="fa-solid fa-plus text-gray-400 group-open:hidden"></i><i class="fa-solid fa-minus text-gray-400 hidden group-open:block"></i>
+                    </summary>
+                    <div class="p-4 border-t dark:border-gray-700 text-sm space-y-2 text-gray-600 dark:text-gray-300">
+                        <p><strong>รองพื้น (อายุ 20-30 วัน):</strong> ใช้ 16-20-0 อัตรา 20-25 กก./ไร่</p>
+                        <p><strong>แตกกอ (อายุ 40-45 วัน):</strong> ใช้ ยูเรีย 46-0-0 อัตรา 10-15 กก./ไร่</p>
+                        <p><strong>รับรวง (ก่อนออกรวง 30 วัน):</strong> ใช้ 15-5-25 อัตรา 20-25 กก./ไร่ ช่วยเพิ่มน้ำหนัก เมล็ดเต่ง</p>
+                    </div>
+                </details>
+                
+                <!-- Rice Varieties -->
+                 <details class="bg-white dark:bg-gray-800 rounded-xl shadow group">
+                    <summary class="p-4 font-bold cursor-pointer outline-none list-none flex justify-between items-center">
+                        <div class="flex items-center"><i class="fa-solid fa-wheat-awn text-orange-500 mr-2"></i> ฐานข้อมูลพันธุ์ข้าว</div>
+                        <i class="fa-solid fa-plus text-gray-400 group-open:hidden"></i><i class="fa-solid fa-minus text-gray-400 hidden group-open:block"></i>
+                    </summary>
+                    <div class="p-4 border-t dark:border-gray-700 text-sm space-y-2 text-gray-600 dark:text-gray-300">
+                        <p><strong>ข้าวเหนียว:</strong> กข6 (ไวแสง), กข14, กข22, สันป่าตอง 1, เขี้ยวงู</p>
+                        <p><strong>ข้าวขาว/ข้าวนุ่ม:</strong> มะลิ 105, กข43, กข79, กข85, ปทุมธานี 1</p>
+                        <p><strong>ข้าวสุขภาพ:</strong> ไรซ์เบอร์รี่, สังข์หยด, ทับทิมชุมแพ</p>
+                    </div>
+                </details>
+            </div>
+        </div>
+
+        <!-- TAB 4: Cost & Image -->
+        <div id="tab-cost" class="tab-content space-y-4">
+            <h2 class="font-bold text-xl mb-4 border-b pb-2 dark:border-gray-700"><i class="fa-solid fa-calculator text-green-500"></i> ต้นทุน & ภาพถ่าย</h2>
+            
+            <!-- P&L -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <h3 class="font-bold border-b pb-2 mb-2 dark:border-gray-700">คำนวณกำไร - ขาดทุน (P&L)</h3>
+                
+                <div class="space-y-2 mb-4">
+                    <div class="flex justify-between text-sm">
+                        <span>รวมรายรับ (ขายข้าว)</span>
+                        <span class="text-green-600 font-bold" id="totalIncome">0 ฿</span>
+                    </div>
+                    <div class="flex justify-between text-sm">
+                        <span>รวมรายจ่าย (ปุ๋ย/ยา/ไถ)</span>
+                        <span class="text-red-500 font-bold" id="totalExpense">0 ฿</span>
+                    </div>
+                    <div class="flex justify-between font-bold text-lg pt-2 border-t dark:border-gray-700">
+                        <span>กำไรสุทธิ</span>
+                        <span class="text-blue-600 dark:text-blue-400" id="netProfit">0 ฿</span>
+                    </div>
+                </div>
+
+                <!-- Input P&L -->
+                <div class="space-y-2">
+                    <div class="flex space-x-2">
+                        <input type="number" id="inputYield" placeholder="ผลผลิต (กก.)" class="w-1/2 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <input type="number" id="inputPrice" placeholder="ราคา (บาท/กก.)" class="w-1/2 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <button onclick="calculateIncome()" class="w-full bg-green-600 text-white rounded py-2 text-sm font-bold mt-1">บันทึกรายรับ</button>
+                    
+                    <div class="flex space-x-2 mt-4">
+                        <input type="text" placeholder="รายการจ่าย (เช่น ค่าไถ)" class="w-1/2 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                        <input type="number" id="inputExpenseAmt" placeholder="จำนวนเงิน (บาท)" class="w-1/2 border rounded p-2 text-sm dark:bg-gray-700 dark:border-gray-600">
+                    </div>
+                    <button onclick="addExpense()" class="w-full bg-red-500 text-white rounded py-2 text-sm font-bold mt-1">บันทึกรายจ่าย</button>
+                </div>
+            </div>
+
+            <!-- Stage Image Log -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <h3 class="font-bold mb-3">สมุดภาพแปลงนาตามระยะ</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="border rounded p-2 text-center dark:border-gray-600">
+                        <p class="text-xs mb-1">เตรียมแปลง</p>
+                        <button class="bg-gray-200 dark:bg-gray-700 w-full h-20 rounded flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-camera text-2xl"></i>
+                        </button>
+                    </div>
+                    <div class="border rounded p-2 text-center dark:border-gray-600">
+                        <p class="text-xs mb-1">กล้า/แตกกอ</p>
+                        <button class="bg-gray-200 dark:bg-gray-700 w-full h-20 rounded flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-camera text-2xl"></i>
+                        </button>
+                    </div>
+                    <div class="border rounded p-2 text-center dark:border-gray-600">
+                        <p class="text-xs mb-1">ตั้งท้อง/ออกรวง</p>
+                        <button class="bg-gray-200 dark:bg-gray-700 w-full h-20 rounded flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-camera text-2xl"></i>
+                        </button>
+                    </div>
+                    <div class="border rounded p-2 text-center dark:border-gray-600">
+                        <p class="text-xs mb-1">เก็บเกี่ยว</p>
+                        <button class="bg-gray-200 dark:bg-gray-700 w-full h-20 rounded flex items-center justify-center text-gray-400">
+                            <i class="fa-solid fa-camera text-2xl"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Settings -->
+        <div id="tab-settings" class="tab-content space-y-4">
+            <h2 class="font-bold text-xl mb-4 border-b pb-2 dark:border-gray-700"><i class="fa-solid fa-gear text-gray-500"></i> ตั้งค่าระบบ</h2>
+            
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <h3 class="font-bold mb-3">จัดการแปลงนา</h3>
+                <button class="w-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400 border border-green-300 py-2 rounded-lg font-bold mb-2">
+                    <i class="fa-solid fa-plus"></i> เพิ่มแปลงนาใหม่
+                </button>
+                <div class="border rounded p-3 mt-2 dark:border-gray-700 flex justify-between items-center">
+                    <div>
+                        <p class="font-bold">แปลงนา 1 (โนนทุ่ง)</p>
+                        <p class="text-xs text-gray-500">15 ไร่ • กข6</p>
+                    </div>
+                    <button class="text-blue-500"><i class="fa-solid fa-pen"></i></button>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-gray-800 rounded-xl p-4 shadow">
+                <h3 class="font-bold mb-3">ระบบส่งออกข้อมูล</h3>
+                <button class="w-full bg-gray-800 text-white dark:bg-gray-200 dark:text-black py-2 rounded-lg font-bold">
+                    <i class="fa-solid fa-download"></i> ดาวน์โหลดรายงาน (Excel/CSV)
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Weather Forecast Modal (7 Days) -->
+    <div id="weatherModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex justify-center items-center p-4">
+        <div class="bg-white dark:bg-gray-800 rounded-xl w-full max-w-sm p-4 relative">
+            <button onclick="toggleWeatherModal()" class="absolute top-3 right-3 text-gray-500"><i class="fa-solid fa-xmark text-xl"></i></button>
+            <h2 class="font-bold text-lg mb-4">พยากรณ์ล่วงหน้า 7 วัน (อ.เมือง บุรีรัมย์)</h2>
+            <div class="space-y-3 max-h-80 overflow-y-auto">
+                <div class="flex justify-between items-center border-b pb-2 dark:border-gray-700">
+                    <span class="text-sm">วันนี้</span>
+                    <i class="fa-solid fa-cloud-sun text-yellow-500"></i>
+                    <span class="text-sm text-blue-500">ฝน 10%</span>
+                    <span class="text-sm">ลม 8km/h</span>
+                </div>
+                <div class="flex justify-between items-center border-b pb-2 dark:border-gray-700">
+                    <span class="text-sm">พรุ่งนี้</span>
+                    <i class="fa-solid fa-sun text-yellow-500"></i>
+                    <span class="text-sm text-blue-500">ฝน 0%</span>
+                    <span class="text-sm">ลม 12km/h</span>
+                </div>
+                <div class="flex justify-between items-center border-b pb-2 dark:border-gray-700">
+                    <span class="text-sm">พฤหัส</span>
+                    <i class="fa-solid fa-cloud-showers-heavy text-blue-500"></i>
+                    <span class="text-sm text-red-500">ฝน 80%</span>
+                    <span class="text-sm text-red-500">ลม 20km/h</span>
+                </div>
+                <div class="flex justify-between items-center border-b pb-2 dark:border-gray-700">
+                    <span class="text-sm">ศุกร์</span>
+                    <i class="fa-solid fa-cloud text-gray-500"></i>
+                    <span class="text-sm text-blue-500">ฝน 30%</span>
+                    <span class="text-sm">ลม 10km/h</span>
+                </div>
+                <div class="flex justify-between items-center pb-2">
+                    <span class="text-sm text-gray-500 block w-full text-center mt-2">...แสดงข้อมูล 7 วัน</span>
+                </div>
+            </div>
+            <div class="mt-4 bg-green-50 dark:bg-green-900/30 p-2 rounded border border-green-200 dark:border-green-800 text-xs text-center text-green-700 dark:text-green-400">
+                พรุ่งนี้ลมสงบ ไม่มีฝน เหมาะแก่การใช้โดรนพ่นยา
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="fixed bottom-0 w-full bg-white dark:bg-gray-800 border-t dark:border-gray-700 pb-safe z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+        <div class="flex justify-around items-center pt-2 pb-1 max-w-md mx-auto">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="nav-btn flex flex-col items-center p-2 text-green-600 dark:text-green-400">
+                <i class="fa-solid fa-house text-xl mb-1"></i>
+                <span class="text-[10px]">หน้าแรก</span>
+            </button>
+            <button onclick="switchTab('water')" id="nav-water" class="nav-btn flex flex-col items-center p-2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-droplet text-xl mb-1"></i>
+                <span class="text-[10px]">น้ำ/ยา</span>
+            </button>
+            <button onclick="switchTab('knowledge')" id="nav-knowledge" class="nav-btn flex flex-col items-center p-2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-book text-xl mb-1"></i>
+                <span class="text-[10px]">ความรู้</span>
+            </button>
+            <button onclick="switchTab('cost')" id="nav-cost" class="nav-btn flex flex-col items-center p-2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-calculator text-xl mb-1"></i>
+                <span class="text-[10px]">บัญชี/ภาพ</span>
+            </button>
+            <button onclick="switchTab('settings')" id="nav-settings" class="nav-btn flex flex-col items-center p-2 text-gray-400 hover:text-green-600">
+                <i class="fa-solid fa-gear text-xl mb-1"></i>
+                <span class="text-[10px]">ตั้งค่า</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Spacer to ensure content isn't hidden behind bottom nav -->
+    <div class="h-10 w-full"></div>
+
+    <script>
+        // Dark Mode Toggle
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const darkIcon = document.getElementById('darkIcon');
+        const html = document.documentElement;
+
+        darkModeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                darkIcon.classList.remove('fa-moon');
+                darkIcon.classList.add('fa-sun');
+            } else {
+                darkIcon.classList.remove('fa-sun');
+                darkIcon.classList.add('fa-moon');
+            }
+        });
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            // Show selected tab
+            document.getElementById('tab-' + tabName).classList.add('active');
+            
+            // Update Nav Icons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('text-green-600', 'dark:text-green-400');
+                btn.classList.add('text-gray-400');
+            });
+            const activeBtn = document.getElementById('nav-' + tabName);
+            activeBtn.classList.remove('text-gray-400');
+            activeBtn.classList.add('text-green-600', 'dark:text-green-400');
+            
+            // Scroll to top of the page when switching
+            window.scrollTo(0,0);
+        }
+
+        // Weather Modal
+        function toggleWeatherModal() {
+            const modal = document.getElementById('weatherModal');
+            modal.classList.toggle('hidden');
+        }
+
+        // Simple P&L Logic
+        let income = 0;
+        let expense = 0;
+
+        function updateProfit() {
+            const profit = income - expense;
+            document.getElementById('netProfit').innerText = profit.toLocaleString() + ' ฿';
+            if(profit < 0) {
+                document.getElementById('netProfit').classList.remove('text-blue-600', 'dark:text-blue-400');
+                document.getElementById('netProfit').classList.add('text-red-500');
+            } else {
+                document.getElementById('netProfit').classList.add('text-blue-600', 'dark:text-blue-400');
+                document.getElementById('netProfit').classList.remove('text-red-500');
+            }
+        }
+
+        function calculateIncome() {
+            const yieldVal = parseFloat(document.getElementById('inputYield').value) || 0;
+            const price = parseFloat(document.getElementById('inputPrice').value) || 0;
+            if(yieldVal > 0 && price > 0) {
+                income += (yieldVal * price);
+                document.getElementById('totalIncome').innerText = income.toLocaleString() + ' ฿';
+                updateProfit();
+                document.getElementById('inputYield').value = '';
+                document.getElementById('inputPrice').value = '';
+                alert('บันทึกรายรับสำเร็จ');
+            }
+        }
+
+        function addExpense() {
+            const amt = parseFloat(document.getElementById('inputExpenseAmt').value) || 0;
+            if(amt > 0) {
+                expense += amt;
+                document.getElementById('totalExpense').innerText = expense.toLocaleString() + ' ฿';
+                updateProfit();
+                document.getElementById('inputExpenseAmt').value = '';
+                alert('บันทึกรายจ่ายสำเร็จ');
+            }
+        }
+    </script>
+</body>
+</html>
