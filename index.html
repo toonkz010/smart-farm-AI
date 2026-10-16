@@ -305,15 +305,204 @@ function setCustomDate(e,taskId){getP().customDates[taskId]=e.target.value;save(
 
 // Dashboard and checklist
 function renderDashboard(){const p=getP(),v=RICE_V[p.variety]||{name:'ไม่ระบุ',days:120},rai=totalRai();document.getElementById('dashPlotName').innerText=p.name;document.getElementById('dashPlotDetail').innerText=`${v.name} | พื้นที่ ${p.rai} ไร่ ${p.ngan} งาน ${p.wah} ตร.ว.`;const sow=new Date(p.sowDate+'T00:00:00'),today=new Date();today.setHours(0,0,0,0);const age=Math.floor((today-sow)/86400000),valid=Math.max(0,age),pct=Math.min(100,valid/v.days*100),remaining=Math.max(0,v.days-valid);document.getElementById('dashPlotAge').innerText=valid;document.getElementById('dashPlotTotal').innerText=v.days;document.getElementById('dashPlotProgress').style.width=pct+'%';document.getElementById('autoModeToggle').checked=!!p.autoMode;document.getElementById('autoModeLabel').innerText=p.autoMode?'โหมดออโต้':'กำหนดวันเอง';
- const stages=[
-  {id:'s-1',start:-15,end:0,title:'เตรียมแปลงก่อนหว่าน (-15 ถึง 0 วัน)',tasks:[{i:'s-1_0',d:-14,t:'ไถดะพลิกดิน ตาก 7-10 วัน'},{i:'s-1_1',d:-3,t:'ไถแปร/คบดินให้ราบเรียบ'},{i:'s-1_2',d:0,t:`หว่านเมล็ดพันธุ์ <span class="text-emerald-600 dark:text-emerald-400 font-bold ml-1">รวม ${Math.ceil(rai*25)} กก.</span> <span class="text-[10px] text-slate-400 font-normal">(ตัวอย่าง 25 กก./ไร่ ปรับตามพันธุ์และวิธีปลูก)</span>`}]},
-  {id:'s0',start:1,end:5,title:'ระยะคุมเลน (1-5 วัน)',tasks:[{i:'s0_0',d:2,t:'ตรวจระดับน้ำและสำรวจวัชพืชหลังหว่าน'}]},
-  {id:'s1',start:7,end:22,title:'ดูแลต้นกล้า & รองพื้น (7-22 วัน)',tasks:[{i:'s1_0',d:14,t:'ตรวจระดับน้ำและความชื้นในแปลง'},{i:'s1_1',d:16,t:'สำรวจวัชพืชและเลือกวิธีจัดการตามฉลาก'},{i:'s1_2',d:18,t:'ประเมินความต้องการปุ๋ยรองพื้นตามสภาพดิน'}]},
-  {id:'s2',start:25,end:45,title:'แตกกอ & จัดการน้ำ (25-45 วัน)',tasks:[{i:'s2_0',d:30,t:'ตรวจระดับน้ำ/พิจารณาเปียกสลับแห้งตามสภาพนา'},{i:'s2_1',d:40,t:'ประเมินความสมบูรณ์และธาตุอาหารของข้าว'}]},
-  {id:'s3',start:50,end:70,title:'ระยะตั้งท้อง/รับรวง (50-70 วัน)',tasks:[{i:'s3_0',d:50,t:'ตรวจน้ำในแปลงและระยะตั้งท้อง'},{i:'s3_1',d:55,t:'ประเมินธาตุอาหารระยะรับรวงตามคำแนะนำ'},{i:'s3_2',d:60,t:'สำรวจโรคและแมลง หากพบอาการให้ยืนยันสาเหตุก่อนจัดการ'}]},
-  {id:'s4',start:75,end:v.days,title:`สุกแก่ & เก็บเกี่ยว (75-${v.days} วัน)`,tasks:[{i:'s4_0',d:v.days-15,t:'วางแผนระบายน้ำก่อนเก็บเกี่ยวตามสภาพแปลง'},{i:'s4_1',d:v.days,t:'🌾 ประเมินความสุกแก่และเก็บเกี่ยวผลผลิต'}]}
- ];
- let html='',next=null,totalTasks=0,doneTasks=0;stages.forEach(s=>{let done=s.tasks.every(t=>p.tasks[t.i]);const due=age>=s.start&&age<=s.end,open=due||(!done&&age>s.end);const wrap=due?'border-2 border-[#b79b63]/70 bg-[#f6f1e5]/70 dark:bg-amber-900/10':'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50';const badge=done?'<span class="text-emerald-600 dark:text-emerald-400 font-bold text-[10px]"><i class="fa-solid fa-circle-check mr-1"></i>เสร็จครบ</span>':due?'<span class="text-[#96783f] dark:text-amber-300 font-black text-[10px]">ถึงรอบงาน</span>':'<span class="text-slate-400 font-bold text-[10px]">รอเวลา</span>';let tasks='';s.tasks.forEach(t=>{totalTasks++;const checked=!!p.tasks[t.i];if(checked)doneTasks++;let d=addD(p.sowDate,t.d);if(!p.autoMode&&p.customDates[t.i])d=new Date(p.customDates[t.i]+'T00:00:00');const iso=dateISO(d);if(!checked&&!next)next={title:t.t.replace(/<[^>]*>/g,''),date:d,late:d<today,today:d.getTime()===today.getTime()};const dateUI=p.autoMode?`<span class="px-1.5 py-0.5 rounded text-[9px] font-bold mr-1 mb-1 ${due?'text-[#8d7040] bg-[#f1e6cd]':'text-slate-500 bg-slate-100 dark:bg-slate-700'}"><i class="fa-regular fa-calendar mr-1"></i>${fmtD(d)}</span>`:`<input type="date" onchange="setCustomDate(event,'${t.i}')" value="${iso}" class="text-[9px] bg-white dark:bg-slate-900 border rounded px-1 py-0.5 mr-1 mb-1">`;tasks+=`<div class="flex items-start gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 rounded-xl"><input type="checkbox" ${checked?'checked':''} onchange="getP().tasks['${t.i}']=this.checked;save()" class="w-5 h-5 mt-1 accent-emerald-600 flex-shrink-0"><div class="text-[12px] font-medium leading-tight"><div class="mb-1">${dateUI}</div><span class="${checked?'line-through text-slate-400':'text-slate-700 dark:text-slate-200'}">${t.t}</span></div></div>`;});html+=`<div class="rounded-2xl overflow-hidden ${wrap}"><div onclick="document.getElementById('stage_${s.id}').classList.toggle('hidden')" class="px-3 py-3 flex justify-between items-center cursor-pointer bg-slate-50/50 dark:bg-slate-800/80"><div class="font-bold text-[12px]">${s.title}</div>${badge}</div><div id="stage_${s.id}" class="${open?'':'hidden'} p-1.5 border-t border-slate-100 dark:border-slate-700 divide-y divide-slate-50 dark:divide-slate-700">${tasks}</div></div>`;});document.getElementById('checklistTimeline').innerHTML=html;
+ 
+const stages = [
+  {
+    id: 's-1',
+    start: -15,
+    end: 0,
+    title: 'เตรียมแปลงก่อนหว่าน (-15 ถึง 0 วัน)',
+    tasks: [
+      {
+        i: 's-1_0', d: -14,
+        t: 'ไถดะพลิกดินและตากดิน',
+        info: 'ไถดะแล้วตากดินประมาณ 7–10 วัน ช่วยจัดการวัชพืชและเตรียมดิน'
+      },
+      {
+        i: 's-1_1', d: -3,
+        t: 'ไถแปรและปรับระดับแปลง',
+        info: 'ปรับระดับให้สม่ำเสมอ ตรวจคันนาและทางระบายน้ำ ช่วยให้จัดการน้ำและวัชพืชได้ดีขึ้น'
+      },
+      {
+        i: 's-1_2', d: 0,
+        t: 'หว่านเมล็ดพันธุ์',
+        info: `ปริมาณตัวอย่าง ${fmtNum(rai * 25, 1)} กก. สำหรับพื้นที่นี้ (25 กก./ไร่) ให้ปรับตามวิธีปลูก พันธุ์ และอัตราความงอก`
+      }
+    ]
+  },
+
+  {
+    id: 's0',
+    start: 1,
+    end: 8,
+    title: 'คุมวัชพืชก่อนงอก (1–8 วัน)',
+    tasks: [
+      {
+        i: 's0_0', d: 2,
+        t: 'ตรวจการงอกและความชื้นหลังหว่าน',
+        info: 'เดินสำรวจการงอกของข้าวและความชื้นในแปลงก่อนพิจารณาใช้สารกำจัดวัชพืช'
+      },
+      {
+        i: 's0_1', d: 4,
+        t: 'พ่นยาคุมหญ้าก่อนงอก (ถ้าจำเป็น)',
+        info: 'ตัวอย่างนาหว่านน้ำตม: เพรททิลาคลอร์ประมาณ 0–4 วัน หรือบิวทาคลอร์ประมาณ 4–6 วันหลังหว่าน ทั้งนี้ต้องเลือกเพียงผลิตภัณฑ์ที่ฉลากอนุญาตให้ใช้กับวิธีปลูกและระยะข้าวของแปลงนี้ ห้ามเลือกจากจำนวนวันอย่างเดียว'
+      },
+      {
+        i: 's0_2', d: 8,
+        t: 'ตรวจผลยาคุมและสำรวจวัชพืช',
+        info: 'ตรวจว่ามีหญ้า กก หรือวัชพืชใบกว้างเหลืออยู่หรือไม่ อย่าพ่นซ้ำอัตโนมัติโดยไม่ตรวจชนิดวัชพืชและฉลาก'
+      }
+    ]
+  },
+
+  {
+    id: 's1',
+    start: 9,
+    end: 25,
+    title: 'ต้นกล้า จัดการวัชพืช และปุ๋ยครั้งที่ 1',
+    tasks: [
+      {
+        i: 's1_0', d: 14,
+        t: 'ตรวจระดับน้ำและความชื้นในแปลง',
+        info: 'รักษาความชื้นให้เหมาะกับการเจริญของข้าว จัดการน้ำตามระบบนาและสภาพต้นข้าว'
+      },
+      {
+        i: 's1_1', d: 16,
+        t: 'สำรวจวัชพืชหลังงอก',
+        info: 'แยกชนิดวัชพืชว่าเป็นหญ้า กก หรือใบกว้าง แล้วเลือกวิธีจัดการให้ตรงชนิดและระยะของวัชพืช'
+      },
+      {
+        i: 's1_2', d: 18,
+        t: 'ประเมินความต้องการปุ๋ยตามสภาพดิน',
+        info: 'ตรวจพันธุ์ข้าว ชนิดดิน ความสมบูรณ์ของต้น และปุ๋ยที่ใส่ไปแล้วก่อนเลือกสูตรปุ๋ย'
+      },
+      {
+        i: 's1_3', d: 22,
+        t: 'ปุ๋ยครั้งที่ 1: ปุ๋ยรองพื้น',
+        info: `แนวทางตัวอย่างจากกรมการข้าว สำหรับช่วงประมาณ 20–30 วันหลังข้าวงอก:
+ดินร่วนเหนียวหรือดินเหนียว ใช้สูตร 16-20-0
+• พันธุ์ไวต่อช่วงแสง: 20–25 กก./ไร่ (รวม ${fmtNum(rai * 20, 1)}–${fmtNum(rai * 25, 1)} กก.)
+• พันธุ์ไม่ไวต่อช่วงแสง: 30–35 กก./ไร่ (รวม ${fmtNum(rai * 30, 1)}–${fmtNum(rai * 35, 1)} กก.)
+
+ดินทรายหรือร่วนทราย อาจใช้สูตร 16-16-8 โดยเลือกอัตราตามพันธุ์และคำแนะนำสำหรับดินชนิดนั้น
+
+เลือกสูตรให้เหมาะกับดินและพันธุ์ ไม่ใส่ทุกสูตรรวมกัน และอย่าใช้ปริมาณนี้แทนผลวิเคราะห์ดินโดยอัตโนมัติ`
+      }
+    ]
+  },
+
+  {
+    id: 's2',
+    start: 25,
+    end: 45,
+    title: 'ระยะแตกกอ ตรวจปุ๋ย และฮอร์โมน',
+    tasks: [
+      {
+        i: 's2_0', d: 30,
+        t: 'ตรวจระดับน้ำและการแตกกอ',
+        info: 'ดูจำนวนหน่อต่อต้น สีใบ ความสม่ำเสมอของแปลง และสภาพน้ำก่อนตัดสินใจใส่ปุ๋ยเสริม'
+      },
+      {
+        i: 's2_2', d: 30,
+        t: 'ประเมินปุ๋ยยูเรีย 46-0-0',
+        info: `อย่าใส่ยูเรียเพียงเพราะถึงวันที่กำหนด หากใช้แผ่นเทียบสีใบข้าวและค่าเฉลี่ยอยู่ที่ระดับ 3 หรือต่ำกว่า แนวทางหนึ่งสำหรับข้าวไม่ไวต่อช่วงแสงอายุสั้นประมาณ 110–120 วัน คือพิจารณายูเรีย 46-0-0 อัตรา 7–10 กก./ไร่ (รวม ${fmtNum(rai * 7, 1)}–${fmtNum(rai * 10, 1)} กก.) หากสีใบมากกว่า 3 ไม่จำเป็นต้องใส่ตามแนวทางนี้ ให้ตรวจซ้ำทุก 7–10 วันและปรับตามพันธุ์กับสภาพแปลง`
+      },
+      {
+        i: 's2_1', d: 40,
+        t: 'ตรวจความสมบูรณ์ของต้นข้าว',
+        info: 'หากใบเขียวเข้มและแตกกอดี อย่าเร่งไนโตรเจนเพิ่มโดยไม่จำเป็น เพราะอาจทำให้ต้นอวบน้ำหรือล้มง่าย'
+      },
+      {
+        i: 's2_3', d: 30,
+        t: 'ฮอร์โมนรอบแตกกอ (ทางเลือก)',
+        info: 'อาจพิจารณาผลิตภัณฑ์กรดอะมิโนหรือสาหร่ายที่ฉลากระบุว่าใช้กับข้าวได้ แต่ไม่จำเป็นต้องใช้ทุกแปลง ไม่มีอัตราเดียวสำหรับทุกยี่ห้อ ให้ใช้ตามอัตราบนฉลาก และไม่ผสมกับยาฆ่าหญ้าหรือสารอื่นหากฉลากไม่รองรับ'
+      }
+    ]
+  },
+
+  {
+    id: 's3',
+    start: 46,
+    end: 70,
+    title: 'ระยะกำเนิดช่อดอก ตั้งท้อง และรับรวง',
+    tasks: [
+      {
+        i: 's3_0', d: 50,
+        t: 'ตรวจน้ำและระยะการเจริญของข้าว',
+        info: 'ดูระยะจริงของต้นข้าว ไม่ยึดอายุเพียงอย่างเดียว โดยเฉพาะพันธุ์ที่อายุสั้นหรือไวต่อช่วงแสง'
+      },
+      {
+        i: 's3_3', d: 55,
+        t: 'ปุ๋ยครั้งถัดไป: ประเมินระยะกำเนิดช่อดอก',
+        info: `ใช้ระยะกำเนิดช่อดอกเป็นหลัก ซึ่งมักอยู่ราว 25–30 วันก่อนออกดอก:
+• ตัวอย่างแนวทางกรมการข้าวสำหรับข้าวไวต่อช่วงแสง: ยูเรีย 46-0-0 อัตรา 10 กก./ไร่ (รวม ${fmtNum(rai * 10, 1)} กก.)
+• ข้าวไม่ไวต่อช่วงแสง: ยูเรีย 46-0-0 อัตรา 20 กก./ไร่ (รวม ${fmtNum(rai * 20, 1)} กก.)
+
+เป็นแนวทางตามชนิดข้าว ไม่ใช่คำสั่งให้ใส่ทุกแปลง หากเพิ่งใส่ยูเรียไปแล้ว ใบเขียวเข้ม หรือมีคำแนะนำตามผลวิเคราะห์ดินต่างออกไป อย่าใส่ซ้ำอัตโนมัติ ให้ปรับวันด้วยโหมดกำหนดวันเองตามระยะจริง`
+      },
+      {
+        i: 's3_4', d: 48,
+        t: 'ฮอร์โมนรอบก่อนตั้งท้อง (ทางเลือก)',
+        info: 'ใช้เฉพาะเมื่อจำเป็นและตรงกับระยะที่ฉลากผลิตภัณฑ์ระบุ ไม่ใช่ปุ๋ยหลักและไม่สามารถทดแทนธาตุอาหารได้ หากข้าวปกติดีอาจข้ามรอบนี้ได้'
+      },
+      {
+        i: 's3_1', d: 55,
+        t: 'ประเมินธาตุอาหารระยะรับรวง',
+        info: 'ตรวจสีใบ ความสมบูรณ์ และปุ๋ยที่ใส่สะสมมาก่อน ไม่จำเป็นต้องใช้สูตร 15-5-25 ทุกแปลง ให้เลือกตามดิน พันธุ์ และคำแนะนำในพื้นที่'
+      },
+      {
+        i: 's3_2', d: 60,
+        t: 'สำรวจโรคและแมลง',
+        info: 'ตรวจใบ กาบใบ และรวง หากพบอาการผิดปกติให้ยืนยันสาเหตุก่อนเลือกสารป้องกันกำจัด ไม่จำเป็นต้องพ่นยาป้องกันทุกครั้งตามปฏิทิน'
+      }
+    ]
+  },
+
+  {
+    id: 's4',
+    start: 75,
+    end: v.days,
+    title: `สุกแก่และเก็บเกี่ยว (75–${v.days} วัน)`,
+    tasks: [
+      {
+        i: 's4_0', d: v.days - 15,
+        t: 'วางแผนระบายน้ำก่อนเก็บเกี่ยว',
+        info: 'พิจารณาสภาพดิน ฝน และกำหนดวันรถเกี่ยว รักษาระดับความแห้งที่เหมาะสมกับสภาพแปลง'
+      },
+      {
+        i: 's4_1', d: v.days,
+        t: 'ประเมินความสุกแก่และเก็บเกี่ยว',
+        info: 'ตรวจความสุกของรวงและความชื้นเมล็ดจริง วันเก็บเกี่ยวเป็นค่าประมาณตามอายุพันธุ์เท่านั้น'
+      }
+    ]
+  }
+];
+
+ let html='',next=null,totalTasks=0,doneTasks=0;stages.forEach(s=>{let done=s.tasks.every(t=>p.tasks[t.i]);const due=age>=s.start&&age<=s.end,open=due||(!done&&age>s.end);const wrap=due?'border-2 border-[#b79b63]/70 bg-[#f6f1e5]/70 dark:bg-amber-900/10':'border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/50';const badge=done?'<span class="text-emerald-600 dark:text-emerald-400 font-bold text-[10px]"><i class="fa-solid fa-circle-check mr-1"></i>เสร็จครบ</span>':due?'<span class="text-[#96783f] dark:text-amber-300 font-black text-[10px]">ถึงรอบงาน</span>':'<span class="text-slate-400 font-bold text-[10px]">รอเวลา</span>';let tasks='';s.tasks.forEach(t=>{totalTasks++;const checked=!!p.tasks[t.i];if(checked)doneTasks++;let d=addD(p.sowDate,t.d);if(!p.autoMode&&p.customDates[t.i])d=new Date(p.customDates[t.i]+'T00:00:00');const iso=dateISO(d);if(!checked&&!next)next={title:t.t.replace(/<[^>]*>/g,''),date:d,late:d<today,today:d.getTime()===today.getTime()};const dateUI=p.autoMode?`<span class="px-1.5 py-0.5 rounded text-[9px] font-bold mr-1 mb-1 ${due?'text-[#8d7040] bg-[#f1e6cd]':'text-slate-500 bg-slate-100 dark:bg-slate-700'}"><i class="fa-regular fa-calendar mr-1"></i>${fmtD(d)}</span>`:`<input type="date" onchange="setCustomDate(event,'${t.i}')" value="${iso}" class="text-[9px] bg-white dark:bg-slate-900 border rounded px-1 py-0.5 mr-1 mb-1">`;
+tasks += `<div class="flex items-start gap-3 p-3 hover:bg-slate-50 dark:hover:bg-slate-700/30 rounded-xl">
+  <input type="checkbox" ${checked ? 'checked' : ''}
+    onchange="getP().tasks['${t.i}']=this.checked;save()"
+    class="w-5 h-5 mt-1 accent-emerald-600 flex-shrink-0">
+
+  <div class="flex-1 min-w-0 text-[12px] font-medium leading-relaxed">
+    <div class="mb-1">${dateUI}</div>
+
+    <div class="${checked
+      ? 'line-through text-slate-400'
+      : 'text-slate-700 dark:text-slate-200'} font-semibold">
+      ${escapeHTML(t.t)}
+    </div>
+
+    ${t.info ? `
+      <div class="mt-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-900/60 p-2.5
+                  text-[10px] leading-relaxed text-slate-600 dark:text-slate-300
+                  whitespace-pre-line">
+        ${escapeHTML(t.info)}
+      </div>
+    ` : ''}
+  </div>
+</div>`;
+
  const donePct=totalTasks?Math.round(doneTasks/totalTasks*100):0;const a=document.getElementById('dashProgressLabel');if(a)a.textContent=`งานเสร็จ ${donePct}%`;const b=document.getElementById('dashTaskProgressBar');if(b)b.style.width=donePct+'%';const c=document.getElementById('dashTasksCompleted');if(c)c.textContent=`${doneTasks}/${totalTasks}`;const d=document.getElementById('dashDaysToHarvest');if(d)d.textContent=remaining===0?'ถึงรอบ':remaining;const e=document.getElementById('dashPinnedPlots');if(e)e.textContent=state.plots.filter(pl=>pl.lat!==null&&pl.lng!==null&&Number.isFinite(Number(pl.lat))&&Number.isFinite(Number(pl.lng))).length;
  const box=document.getElementById('upNextWidget');if(next){box.classList.remove('hidden');document.getElementById('upNextTitle').innerText=next.title;document.getElementById('upNextDate').innerText=(next.late?'เลยกำหนด: ':next.today?'กำหนดวันนี้: ':'กำหนด: ')+fmtD(next.date);box.className='relative overflow-hidden rounded-2xl shadow-sm p-4 flex items-center '+((next.late||next.today)?'bg-gradient-to-r from-[#b97670] to-[#995c59]':'bg-gradient-to-r from-[#719681] to-[#4f7966]');}else box.classList.add('hidden');updateMapStatus();updateWeatherSummary();}
 
