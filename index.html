@@ -146,7 +146,7 @@ html.dark .soft-panel{background:linear-gradient(145deg,#17241f,#14201c);border-
             </div>
             <div class="grid grid-cols-3 gap-2"><button onclick="undoMapPoint()" class="map-tool-btn"><i class="fa-solid fa-rotate-left mr-1"></i>ย้อนจุด</button><button onclick="finishMapMeasure()" class="map-tool-btn"><i class="fa-solid fa-check mr-1"></i>เสร็จสิ้น</button><button onclick="clearMapMeasurement()" class="map-tool-btn"><i class="fa-solid fa-eraser mr-1"></i>ล้างเส้นวัด</button></div>
             <div class="mt-2 flex flex-wrap items-center gap-2"><label for="mapBaseSelect" class="text-[10px] font-bold text-slate-600 dark:text-slate-300"><i class="fa-solid fa-layer-group mr-1"></i>ชนิดแผนที่</label><select id="mapBaseSelect" onchange="switchMapBase(this.value)" class="flex-1 min-w-[150px] rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 text-[11px] font-bold px-3 py-2 text-slate-700 dark:text-slate-200"><option value="satellite" selected>ภาพถ่ายดาวเทียม</option><option value="street">แผนที่ถนน</option></select></div>
-            <p id="mapInstruction" class="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 mt-2">แตะบนแผนที่เพื่อปักหมุดตำแหน่งแปลงที่เลือก</p>
+            <p id="mnstruction" class="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 mt-2">แตะบนแผนที่เพื่อปักหมุดตำแหน่งแปลงที่เลือก</p>
           </div>
           <div id="plotMap" class="border border-slate-200 dark:border-slate-700"></div>
           <div class="mt-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-[#f8faf7] dark:bg-slate-900/50 p-3"><div class="flex items-center justify-between gap-2 mb-1"><div class="text-[10px] font-extrabold text-slate-700 dark:text-slate-200"><i class="fa-solid fa-ruler-combined text-emerald-600 mr-1"></i>ผลการวัด</div><span id="mapMeasurePoints" class="text-[9px] text-slate-400">0 จุด</span></div><div id="mapMeasureResult" class="text-sm font-black text-slate-800 dark:text-white">ยังไม่มีการวัดระยะหรือพื้นที่</div><div id="mapMeasureNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-1">วาดแนวตามขอบแปลงให้ใกล้เคียงที่สุด ผลเป็นค่าประมาณจากแผนที่ ไม่ใช่การรังวัดทางกฎหมาย</div></div>
@@ -240,12 +240,12 @@ html.dark .soft-panel{background:linear-gradient(145deg,#17241f,#14201c);border-
 // IMPORTANT: Replace these values with your Firebase project's Web app config.
 // Firebase Console > Project settings > Your apps > SDK setup and configuration.
 const firebaseConfig = {
-  apiKey: "ใส่_API_KEY_ของคุณ",
-  authDomain: "ใส่_PROJECT_ID.firebaseapp.com",
-  projectId: "ใส่_PROJECT_ID",
-  storageBucket: "ใส่_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "ใส่_MESSAGING_SENDER_ID",
-  appId: "ใส่_APP_ID"
+  apiKey: "AIzaSyAYUAhY4I_QVcGvk7fFCqaAFKlhcZXSLbs",
+  authDomain: "ai-smart-farm-2c987.firebaseapp.com",
+  projectId: "ai-smart-farm-2c987",
+  storageBucket: "ai-smart-farm-2c987.firebasestorage.app",
+  messagingSenderId: "568669163604",
+  appId: "1:568669163604:web:7275a05c774f5326761dc1",
 };
 
 const RICE_V={
