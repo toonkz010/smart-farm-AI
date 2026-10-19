@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/satellite-surface.js": {
+      "maxDuration": 60,
+      "memory": 1024
+    }
+  }
+}

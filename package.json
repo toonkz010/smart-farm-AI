@@ -1,0 +1,11 @@
+{
+  "name": "smart-farm-satellite-vercel",
+  "private": true,
+  "engines": {
+    "node": "20.x"
+  },
+  "dependencies": {
+    "@google/earthengine": "^1.5.10",
+    "firebase-admin": "^13.0.0"
+  }
+}
