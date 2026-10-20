@@ -213,6 +213,44 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
           <label class="cursor-pointer"><input type="radio" name="waterLevel" value="ชื้นพอดี (0 ซม.)" class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 rounded-2xl p-3 text-center"><i class="fa-solid fa-seedling text-emerald-500 text-2xl mb-1.5"></i><div class="text-[10px] font-bold">ชื้นพอดี</div></div></label>
           <label class="cursor-pointer"><input type="radio" name="waterLevel" value="ขังน้ำ (+5 ซม.)" class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-sky-500 peer-checked:bg-sky-50 dark:peer-checked:bg-sky-900/20 rounded-2xl p-3 text-center"><i class="fa-solid fa-water text-sky-500 text-2xl mb-1.5"></i><div class="text-[10px] font-bold">ขังน้ำ</div></div></label>
         </div><button type="submit" class="w-full bg-slate-800 dark:bg-sky-600 text-white font-bold py-3 rounded-xl text-sm shadow-md">บันทึกระดับน้ำวันนี้</button></form><div class="mt-5 border-t border-slate-100 dark:border-slate-700 pt-4"><div id="waterHistoryList" class="space-y-2"></div></div>
+      </div><!-- 1) ระบบคำนวณสูตรผสมปุ๋ยเมื่อได้ผลเทสดิน (อยู่ในหน้าน้ำ/ยา) -->
+      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-bold flex items-center text-slate-800 dark:text-white">
+            <span class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center mr-2"><i class="fa-solid fa-flask-vial"></i></span>
+            คำนวณสูตรผสมปุ๋ยตามผลตรวจดิน (ปุ๋ยสั่งตัด)
+          </h2>
+          <span id="soilCalcAreaBadge" class="text-[10px] font-bold bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 px-2.5 py-1 rounded-full">0 ไร่</span>
+        </div>
+        <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
+          <div class="grid grid-cols-3 gap-2">
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">ไนโตรเจน (N/OM)</label>
+              <select id="soilTestN" onchange="saveSoilTestAndCalc()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl px-2.5 py-2 text-xs font-bold">
+                <option value="low">ต่ำ (&lt;1.5%)</option>
+                <option value="med" selected>ปานกลาง (1.5-2.5%)</option>
+                <option value="high">สูง (&gt;2.5%)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">ฟอสฟอรัส (P)</label>
+              <select id="soilTestP" onchange="saveSoilTestAndCalc()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl px-2.5 py-2 text-xs font-bold">
+                <option value="low">ต่ำ (&lt;10 ppm)</option>
+                <option value="med" selected>ปานกลาง (10-25 ppm)</option>
+                <option value="high">สูง (&gt;25 ppm)</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold text-slate-500 mb-1">โพแทสเซียม (K)</label>
+              <select id="soilTestK" onchange="saveSoilTestAndCalc()" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-xl px-2.5 py-2 text-xs font-bold">
+                <option value="low">ต่ำ (&lt;60 ppm)</option>
+                <option value="med" selected>ปานกลาง (60-120 ppm)</option>
+                <option value="high">สูง (&gt;120 ppm)</option>
+              </select>
+            </div>
+          </div>
+          <div id="soilFertResultBox" class="rounded-xl bg-white dark:bg-slate-800 border border-emerald-200 dark:border-emerald-800/60 p-3 text-xs space-y-2"></div>
+        </div>
       </div>
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5"><h2 class="text-sm font-bold flex items-center mb-4"><span class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 flex items-center justify-center mr-2"><i class="fa-solid fa-spray-can"></i></span>บันทึกพ่นยา & ระยะปลอดภัย</h2>
         <form onsubmit="addChemLog(event)" class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3"><div class="grid grid-cols-2 gap-3"><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ประเภท</label><select id="chemTypeInput" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold"><option value="ฮอร์โมน/อาหารเสริม">🌱 ฮอร์โมน</option><option value="ยาฆ่าหญ้า (วัชพืช)">🍂 ยาฆ่าหญ้า</option><option value="ยาป้องกันโรค/แมลง">🐛 ป้องกันโรค/แมลง</option></select></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ชื่อสารเคมี</label><input list="chemPresets" id="chemNameInput" placeholder="เช่น 2,4-D, MCPA" required class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold"><datalist id="chemPresets"><option value="2,4-D (คุม-ฆ่าหญ้าใบกว้าง)"><option value="MCPA (หญ้าหนวดปลาดุก/ผักบุ้ง)"><option value="ไอโซโพรไทโอเลน (โรคไหม้)"><option value="อะมิโน + สาหร่ายสกัด"></datalist></div></div>
@@ -247,6 +285,37 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
     <!-- TAB 4: COST, PROFIT & PHOTO GALLERY -->
     <section id="tab-cost" class="tab-pane space-y-4"><div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5"><h2 class="text-sm font-bold flex items-center mb-4"><span class="w-7 h-7 rounded-lg bg-emerald-100 dark:bg-emerald-900/50 text-emerald-600 flex items-center justify-center mr-2"><i class="fa-solid fa-chart-pie"></i></span>บัญชีต้นทุน-กำไร</h2>
       <div class="grid grid-cols-2 gap-2 mb-4"><div class="bg-rose-50 dark:bg-rose-900/20 p-2.5 rounded-xl border border-rose-100 dark:border-rose-900/50 text-center"><div class="text-[9px] font-bold text-rose-500">รวมรายจ่าย</div><div id="plTotalExp" class="text-base font-black text-rose-700 dark:text-rose-400">0 ฿</div></div><div class="bg-emerald-50 dark:bg-emerald-900/20 p-2.5 rounded-xl border border-emerald-100 dark:border-emerald-900/50 text-center"><div class="text-[9px] font-bold text-emerald-500">รวมรายรับ</div><div id="plTotalInc" class="text-base font-black text-emerald-700 dark:text-emerald-400">0 ฿</div></div></div><div class="bg-slate-800 dark:bg-black p-4 rounded-2xl mb-4 text-center"><div class="text-[10px] text-slate-400 font-bold mb-1">กำไรสุทธิ</div><div id="plNetProfit" class="text-3xl font-black text-amber-400">0 ฿</div><div id="plProfitPerRai" class="text-[11px] text-emerald-300 mt-1 font-bold">0 ฿ / ไร่</div></div>
+      <!-- 2) ระบบคำนวณผลผลิตที่คาดว่าจะได้จากดาวเทียม (อยู่ในหน้าบัญชี) -->
+      <div class="mb-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 bg-gradient-to-br from-[#f4faf6] to-[#e8f3ec] dark:from-slate-900 dark:to-slate-800/90 p-3.5 shadow-sm">
+        <div class="flex items-center justify-between gap-2 mb-2">
+          <div class="text-xs font-extrabold text-emerald-900 dark:text-emerald-300">
+            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1.5"></i>คาดการณ์ผลผลิต & รายได้จากดาวเทียม (NDVI)
+          </div>
+          <span id="yieldEstBadge" class="text-[9px] font-bold rounded-full px-2 py-0.5 bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-sm">รอข้อมูล</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div class="metric-card text-center">
+            <div class="text-[9px] text-slate-500">คาดการณ์/ไร่</div>
+            <div id="yieldPerRai" class="text-sm font-black text-slate-800 dark:text-white">— กก.</div>
+          </div>
+          <div class="metric-card text-center">
+            <div class="text-[9px] text-slate-500">ผลผลิตรวม</div>
+            <div id="yieldTotalKg" class="text-sm font-black text-emerald-700 dark:text-emerald-400">— ตัน</div>
+          </div>
+          <div class="metric-card text-center">
+            <div class="text-[9px] text-slate-500">รายได้ประเมิน</div>
+            <div id="yieldEstIncome" class="text-sm font-black text-amber-600 dark:text-amber-400">— ฿</div>
+          </div>
+        </div>
+        <div class="mt-2.5 flex items-center justify-between gap-2 text-[10px] bg-white/70 dark:bg-slate-800/70 rounded-xl px-3 py-1.5 border border-emerald-100 dark:border-slate-700">
+          <label class="font-bold text-slate-600 dark:text-slate-300">ราคาประเมิน (บาท/กก.):</label>
+          <div class="flex items-center gap-1.5">
+            <input id="yieldAssumedPrice" type="number" value="10.5" min="1" step="0.5" oninput="renderSatelliteYieldEstimation()" class="w-16 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 px-2 py-1 text-right font-black text-xs">
+            <button type="button" onclick="fillExpectedYieldToForm()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg text-[9px] font-bold" title="ดึงค่าลงฟอร์มขายข้าวจริง">ดึงลงฟอร์มขาย</button>
+          </div>
+        </div>
+        <p id="yieldEstNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-1.5 leading-relaxed">ประเมินจากดัชนี NDVI ล่าสุด พันธุ์ข้าว และพื้นที่แปลง</p>
+      </div>
       <form onsubmit="addHarvestIncome(event)" class="space-y-3 mb-4 bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-2xl border border-emerald-200 dark:border-emerald-700/50"><h3 class="text-[11px] font-bold text-emerald-700 dark:text-emerald-400"><i class="fa-solid fa-sack-dollar mr-1.5"></i>บันทึกขายข้าว</h3><div class="grid grid-cols-2 gap-2"><div><label class="block text-[10px] font-bold text-emerald-600 mb-1">ผลผลิต (กก.)</label><input type="number" id="harvestYield" required min="1" placeholder="เช่น 8000" class="w-full bg-white dark:bg-slate-800 border border-emerald-200 rounded-lg px-3 py-2 text-xs font-bold"></div><div><label class="block text-[10px] font-bold text-emerald-600 mb-1">ราคาขาย (บาท/กก.)</label><input type="number" id="harvestPrice" required min="1" step="0.1" placeholder="เช่น 12" class="w-full bg-white dark:bg-slate-800 border border-emerald-200 rounded-lg px-3 py-2 text-xs font-bold"></div></div><button type="submit" class="w-full bg-emerald-500 text-white py-2 rounded-lg text-xs font-bold">คำนวณและบันทึกรายรับ</button></form>
       <form onsubmit="addTransaction(event)" class="space-y-3 mb-5 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-2xl border border-slate-200 dark:border-slate-700"><div class="flex items-center gap-4 mb-1 px-1"><label class="flex items-center text-[11px] font-bold"><input type="radio" name="trxType" value="exp" checked class="mr-1">บันทึกรายจ่าย</label><label class="flex items-center text-[11px] font-bold text-emerald-600"><input type="radio" name="trxType" value="inc" class="mr-1">บันทึกรายรับ</label></div><div class="grid grid-cols-2 gap-2"><input type="text" id="trxDesc" placeholder="รายการ (ค่าไถ, ปุ๋ย, ขาย)" required class="w-full bg-white dark:bg-slate-800 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold"><input type="number" id="trxAmt" placeholder="จำนวนเงิน ฿" required min="1" class="w-full bg-white dark:bg-slate-800 border border-slate-300 rounded-lg px-3 py-2 text-xs font-bold"></div><button type="submit" class="w-full bg-slate-800 dark:bg-slate-700 text-white py-2 rounded-lg text-xs font-bold">เพิ่มรายการ</button></form><div id="transactionList" class="divide-y divide-slate-100 dark:divide-slate-700"></div>
     </div>
@@ -694,6 +763,209 @@ window.addEventListener('resize',()=>{if(plotMap&&document.getElementById('mapCo
 window.addEventListener('pageshow',()=>{document.documentElement.style.overflowY='auto';document.body.style.overflowY='auto';if(plotMap)setTimeout(()=>plotMap.invalidateSize(),120);});
 
 // Launch app. Firebase config must be filled in before login/register can work.
+// ============================================================================
+// 1) ระบบคำนวณสูตรผสมปุ๋ยอัตโนมัติจากผลตรวจดิน (อยู่ในหน้าน้ำ/ยา)
+// ============================================================================
+function calculateSoilMix(nLevel, pLevel, kLevel, isSensitive, rai) {
+  const reqN = isSensitive ? {low: 12, med: 9, high: 6}[nLevel] : {low: 18, med: 14, high: 9}[nLevel];
+  const reqP = {low: 6, med: 3, high: 0}[pLevel];
+  const reqK = {low: 6, med: 3, high: 0}[kLevel];
+
+  const dapPerRai = reqP > 0 ? (reqP / 0.46) : 0; // 18-46-0
+  const nFromDap = dapPerRai * 0.18;
+  const remainN = Math.max(0, reqN - nFromDap);
+  const ureaPerRai = remainN / 0.46; // 46-0-0
+  const mopPerRai = reqK > 0 ? (reqK / 0.60) : 0; // 0-0-60
+
+  const ureaSplit1 = Math.max(0, (reqN * 0.55 - nFromDap) / 0.46);
+  const ureaSplit2 = Math.max(0, ureaPerRai - ureaSplit1);
+
+  return {
+    req: { n: reqN, p: reqP, k: reqK },
+    perRai: { urea: ureaPerRai, dap: dapPerRai, mop: mopPerRai, urea1: ureaSplit1, urea2: ureaSplit2 },
+    totalPlot: {
+      urea: ureaPerRai * rai,
+      dap: dapPerRai * rai,
+      mop: mopPerRai * rai,
+      bagsUrea: (ureaPerRai * rai) / 50,
+      bagsDap: (dapPerRai * rai) / 50,
+      bagsMop: (mopPerRai * rai) / 50
+    }
+  };
+}
+
+function saveSoilTestAndCalc() {
+  const p = getP();
+  if (!p) return;
+  const n = document.getElementById('soilTestN')?.value || 'med';
+  const phos = document.getElementById('soilTestP')?.value || 'med';
+  const k = document.getElementById('soilTestK')?.value || 'med';
+  p.soilTest = { n, p: phos, k };
+  saveLocal();
+  renderSoilTestCalculator();
+  if (!isLoadingState && db && cloudReady) {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(syncCloud, 700);
+  }
+}
+
+function renderSoilTestCalculator() {
+  const p = getP();
+  const box = document.getElementById('soilFertResultBox');
+  const badge = document.getElementById('soilCalcAreaBadge');
+  if (!p || !box) return;
+
+  const rai = totalRai();
+  if (badge) badge.textContent = `พื้นที่ ${fmtNum(rai, 2)} ไร่`;
+
+  const st = p.soilTest || { n: 'med', p: 'med', k: 'med' };
+  const elN = document.getElementById('soilTestN');
+  const elP = document.getElementById('soilTestP');
+  const elK = document.getElementById('soilTestK');
+  if (elN) elN.value = st.n;
+  if (elP) elP.value = st.p;
+  if (elK) elK.value = st.k;
+
+  const isSens = (RICE_SENSITIVITY[p.variety] || 'insensitive') === 'sensitive';
+  const res = calculateSoilMix(st.n, st.p, st.k, isSens, rai);
+
+  box.innerHTML = `
+    <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 pb-2">
+      <span class="font-bold text-slate-600 dark:text-slate-300">ค่าธาตุอาหารที่ต้องใช้ (N-P-K):</span>
+      <span class="font-black text-emerald-700 dark:text-emerald-300">${res.req.n} - ${res.req.p} - ${res.req.k} กก./ไร่</span>
+    </div>
+    <div class="grid grid-cols-3 gap-2 pt-1 text-center">
+      <div class="bg-emerald-50/70 dark:bg-slate-900/60 p-2 rounded-lg">
+        <div class="text-[9px] text-slate-500 font-bold">ยูเรีย (46-0-0)</div>
+        <div class="text-sm font-black text-slate-800 dark:text-white">${fmtNum(res.perRai.urea, 1)} <span class="text-[9px] font-normal">กก./ไร่</span></div>
+        <div class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-400 mt-0.5">รวม ${fmtNum(res.totalPlot.urea, 1)} กก.</div>
+        <div class="text-[9px] text-slate-400">(~${fmtNum(res.totalPlot.bagsUrea, 1)} กระสอบ)</div>
+      </div>
+      <div class="bg-sky-50/70 dark:bg-slate-900/60 p-2 rounded-lg">
+        <div class="text-[9px] text-slate-500 font-bold">DAP (18-46-0)</div>
+        <div class="text-sm font-black text-slate-800 dark:text-white">${fmtNum(res.perRai.dap, 1)} <span class="text-[9px] font-normal">กก./ไร่</span></div>
+        <div class="text-[10px] font-extrabold text-sky-700 dark:text-sky-400 mt-0.5">รวม ${fmtNum(res.totalPlot.dap, 1)} กก.</div>
+        <div class="text-[9px] text-slate-400">(~${fmtNum(res.totalPlot.bagsDap, 1)} กระสอบ)</div>
+      </div>
+      <div class="bg-amber-50/70 dark:bg-slate-900/60 p-2 rounded-lg">
+        <div class="text-[9px] text-slate-500 font-bold">MOP (0-0-60)</div>
+        <div class="text-sm font-black text-slate-800 dark:text-white">${fmtNum(res.perRai.mop, 1)} <span class="text-[9px] font-normal">กก./ไร่</span></div>
+        <div class="text-[10px] font-extrabold text-amber-700 dark:text-amber-400 mt-0.5">รวม ${fmtNum(res.totalPlot.mop, 1)} กก.</div>
+        <div class="text-[9px] text-slate-400">(~${fmtNum(res.totalPlot.bagsMop, 1)} กระสอบ)</div>
+      </div>
+    </div>
+    <div class="bg-slate-50 dark:bg-slate-900/70 p-2.5 rounded-lg text-[10px] leading-relaxed text-slate-600 dark:text-slate-300">
+      <div><b>รอบที่ 1 (อายุ 20-30 วัน):</b> ผสม 18-46-0 (<b>${fmtNum(res.perRai.dap * rai, 1)}</b> กก.) + 0-0-60 (<b>${fmtNum(res.perRai.mop * rai, 1)}</b> กก.) + 46-0-0 (<b>${fmtNum(res.perRai.urea1 * rai, 1)}</b> กก.) หว่านรวมทั้งแปลง</div>
+      <div class="mt-1"><b>รอบที่ 2 (ระยะกำเนิดช่อดอก/ตั้งท้อง):</b> หว่านยูเรีย 46-0-0 อีก <b>${fmtNum(res.perRai.urea2 * rai, 1)}</b> กก. ทั้งแปลง (${fmtNum(res.perRai.urea2, 1)} กก./ไร่)</div>
+    </div>
+  `;
+}
+
+// ============================================================================
+// 2) ระบบคำนวณผลผลิตที่คาดว่าจะได้จากดาวเทียม (อยู่ในหน้าบัญชี)
+// ============================================================================
+const VARIETY_BASE_YIELD = {
+  kdml105: 550, rd15: 560, rd6: 580, khaoniaoniaogu: 550,
+  rd43: 750, rd85: 850, rd95: 820, pathum1: 780,
+  sanpatong1: 680, maejo2: 670, rd22: 700, riceberry: 520, tubtim: 550
+};
+let _lastEstimatedTotalKg = 0;
+
+function renderSatelliteYieldEstimation() {
+  const p = getP();
+  const elPerRai = document.getElementById('yieldPerRai');
+  const elTotal = document.getElementById('yieldTotalKg');
+  const elIncome = document.getElementById('yieldEstIncome');
+  const elBadge = document.getElementById('yieldEstBadge');
+  const elNote = document.getElementById('yieldEstNote');
+  if (!p || !elPerRai) return;
+
+  const rai = totalRai();
+  const baseYield = VARIETY_BASE_YIELD[p.variety] || 650;
+  const price = Number(document.getElementById('yieldAssumedPrice')?.value) || 10.5;
+
+  const rawNdvi = satelliteSurfaceData?.ndvi;
+  const ndvi = (rawNdvi !== null && rawNdvi !== undefined && Number.isFinite(Number(rawNdvi))) ? Number(rawNdvi) : null;
+
+  let factor = 1.0;
+  let statusText = 'ประเมินตามเกณฑ์พันธุ์';
+  let badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200';
+
+  if (ndvi !== null) {
+    if (ndvi < 0.25) { factor = 0.55; statusText = `NDVI ต่ำ (${ndvi.toFixed(2)})`; badgeClass = 'bg-rose-100 text-rose-800'; }
+    else if (ndvi < 0.45) { factor = 0.80; statusText = `NDVI ปานกลาง (${ndvi.toFixed(2)})`; badgeClass = 'bg-amber-100 text-amber-800'; }
+    else if (ndvi < 0.65) { factor = 1.00; statusText = `NDVI สมบูรณ์ดี (${ndvi.toFixed(2)})`; badgeClass = 'bg-emerald-100 text-emerald-800'; }
+    else { factor = 1.12; statusText = `NDVI หนาแน่นมาก (${ndvi.toFixed(2)})`; badgeClass = 'bg-emerald-200 text-emerald-900'; }
+  }
+
+  const estPerRai = Math.round(baseYield * factor);
+  const estTotalKg = Math.round(estPerRai * rai);
+  _lastEstimatedTotalKg = estTotalKg;
+  const estTons = estTotalKg / 1000;
+  const estIncome = Math.round(estTotalKg * price);
+
+  elPerRai.textContent = `${fmtNum(estPerRai)} กก.`;
+  elTotal.textContent = estTotalKg >= 1000 ? `${fmtNum(estTons, 2)} ตัน` : `${fmtNum(estTotalKg)} กก.`;
+  elIncome.textContent = `${fmtNum(estIncome)} ฿`;
+  if (elBadge) {
+    elBadge.textContent = statusText;
+    elBadge.className = `text-[9px] font-bold rounded-full px-2 py-0.5 ${badgeClass}`;
+  }
+  if (elNote) {
+    elNote.textContent = ndvi !== null
+      ? `คำนวณจาก NDVI ล่าสุด (${ndvi.toFixed(2)}) · พันธุ์ ${RICE_V[p.variety]?.name || ''} พื้นที่ ${fmtNum(rai, 2)} ไร่ (รวม ~${fmtNum(estTotalKg)} กก.)`
+      : `ยังไม่มีค่า NDVI ดาวเทียม · แสดงค่ามาตรฐานพันธุ์ ${RICE_V[p.variety]?.name || ''} บนพื้นที่ ${fmtNum(rai, 2)} ไร่ (รวม ~${fmtNum(estTotalKg)} กก.)`;
+  }
+}
+
+function fillExpectedYieldToForm() {
+  const yInput = document.getElementById('harvestYield');
+  const pInput = document.getElementById('harvestPrice');
+  const assumed = document.getElementById('yieldAssumedPrice')?.value || 10.5;
+  if (yInput && _lastEstimatedTotalKg > 0) yInput.value = _lastEstimatedTotalKg;
+  if (pInput) pInput.value = assumed;
+  showMsg('ดึงตัวเลขผลผลิตลงฟอร์มบันทึกขายข้าวแล้ว');
+}
+
+// ============================================================================
+// 3) ซ่อนเครื่องมือ GPS / เครื่องมือแผนที่ไว้ก่อนใช้งานโดยอัตโนมัติ
+// ============================================================================
+function initDefaultHiddenMapTools() {
+  mapToolsCollapsed = true;
+  const tools = document.getElementById('mapToolbar');
+  const btn = document.getElementById('mapToolsToggleBtn');
+  if (tools) tools.classList.add('hidden');
+  if (btn) btn.innerHTML = '<i class="fa-solid fa-sliders mr-1"></i>แสดงเครื่องมือ / GPS';
+}
+initDefaultHiddenMapTools();
+
+// ผูกฟังก์ชันเข้ากับ Lifecycle เดิมของแอปโดยไม่กระทบโค้ดเก่า
+const _origRenderLogs = renderLogs;
+renderLogs = function() {
+  _origRenderLogs();
+  renderSoilTestCalculator();
+};
+
+const _origRenderCostAndGallery = renderCostAndGallery;
+renderCostAndGallery = function() {
+  _origRenderCostAndGallery();
+  renderSatelliteYieldEstimation();
+};
+
+const _origRenderSatelliteSurfaceData = renderSatelliteSurfaceData;
+renderSatelliteSurfaceData = function() {
+  _origRenderSatelliteSurfaceData();
+  renderSatelliteYieldEstimation();
+};
+
+const _origRenderNdviResult = renderNdviResult;
+renderNdviResult = function(d) {
+  _origRenderNdviResult(d);
+  if (d?.stats?.meanNdvi != null) {
+    satelliteSurfaceData = { ...(satelliteSurfaceData || {}), ndvi: Number(d.stats.meanNdvi), observedAt: d.observedAt };
+    renderSatelliteYieldEstimation();
+  }
+};
 setAuthMode('login');setupFirebase();
 </script>
 </body>
