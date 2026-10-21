@@ -106,6 +106,13 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
     </div>
     <!-- TAB 1: DASHBOARD -->
     <section id="tab-dashboard" class="tab-pane active space-y-4">
+      <div class="dashboard-hero bg-gradient-to-br from-emerald-600 to-teal-800 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden ring-4 ring-emerald-50 dark:ring-slate-800">
+        <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl pointer-events-none"><i class="fa-solid fa-wheat-awn"></i></div>
+        <div class="flex justify-between items-start mb-5 relative z-10"><div><h2 class="text-xl sm:text-2xl font-black leading-tight mb-1" id="dashPlotName">กำลังโหลด...</h2><div class="text-xs text-emerald-100 font-medium" id="dashPlotDetail">กำลังโหลดข้อมูล...</div></div><button onclick="document.getElementById('plotSelectModal').classList.remove('hidden')" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-2 rounded-xl text-xs font-bold transition flex items-center shadow-sm"><i class="fa-solid fa-right-left mr-1.5"></i>สลับแปลง</button></div>
+        <div class="relative z-10 bg-black/20 rounded-2xl p-3 border border-white/10"><div class="flex justify-between text-[11px] font-bold mb-1.5"><span class="text-emerald-50">อายุข้าว: <span id="dashPlotAge" class="text-white text-sm font-black mx-1">0</span> วัน</span><span class="text-emerald-50">เก็บเกี่ยวใน: <span id="dashPlotTotal" class="text-white">120</span> วัน</span></div><div class="w-full bg-black/30 rounded-full h-2.5 shadow-inner overflow-hidden"><div class="bg-gradient-to-r from-amber-300 to-amber-500 h-2.5 rounded-full transition-all duration-1000" id="dashPlotProgress" style="width:0%"></div></div></div>
+      </div>
+      <div id="dashWaterAdvice" class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#f9fbf8] dark:bg-slate-800/80 p-4"></div>
+      <div id="upNextWidget" class="hidden relative overflow-hidden rounded-2xl shadow-sm p-4 flex items-center"><div class="relative z-10 w-full flex items-center space-x-3"><div id="upNextIcon" class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-xl text-white"><i class="fa-solid fa-bell"></i></div><div class="flex-1"><div class="text-[9px] font-black text-white/80 uppercase tracking-widest mb-0.5">งานต่อไป</div><div id="upNextTitle" class="text-white font-bold text-sm leading-tight mb-1">กำลังโหลด...</div><div id="upNextDate" class="text-white/90 font-medium text-[10px] bg-black/20 px-2 py-0.5 rounded-md inline-block">กำหนด: -</div></div></div></div>
       <button type="button" onclick="document.getElementById('weatherModal').classList.remove('hidden');refreshWeatherForecast(false)" class="w-full text-left soft-panel dark:bg-slate-800 rounded-2xl p-4 flex items-center gap-3 shadow-sm hover:shadow-md transition group">
         <div id="weatherCurrentIconWrap" class="w-14 h-14 rounded-2xl bg-[#e1ece5] dark:bg-slate-700 flex items-center justify-center text-2xl text-[#527b66] dark:text-emerald-300 shadow-inner shrink-0"><i id="weatherCurrentIcon" class="fa-solid fa-cloud-sun"></i></div>
         <div class="flex-1 min-w-0">
@@ -115,34 +122,21 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
         </div>
         <div class="shrink-0 text-right"><span class="inline-flex items-center gap-1 rounded-lg bg-white/70 dark:bg-slate-700 px-2 py-1 text-[9px] font-bold text-emerald-700 dark:text-emerald-300"><i class="fa-solid fa-calendar-week"></i> 7 วัน</span><i class="fa-solid fa-chevron-right block mt-2 text-xs text-slate-400 group-hover:translate-x-0.5 transition-transform"></i></div>
       </button>
-      <!-- Hourly forecast (today) -->
-      <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#f9fbf8] dark:bg-slate-800/80 p-4">
-        <div class="flex items-center justify-between gap-3 mb-3"><div class="text-xs font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-clock text-sky-600 mr-1.5"></i>พยากรณ์รายชั่วโมงของวันนี้</div><span id="hourlyForecastBadge" class="text-[9px] font-bold rounded-full px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">รอข้อมูล</span></div>
-        <div id="hourlyForecastScroll" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"><div class="text-[11px] text-slate-500 py-3 px-1">กำลังรอข้อมูลรายชั่วโมง...</div></div>
-        <p id="hourlyForecastNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">ทุก 2 ชั่วโมง · กรอบสีเขียว = แนวโน้มปลอดฝน (โอกาสฝน &lt; 30%) ใช้ประกอบการวางแผนพ่นยา/ใส่ปุ๋ย ต้องตรวจสภาพจริงและฉลากก่อนทำงาน</p>
-      </div>
       <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#f9fbf8] dark:bg-slate-800/80 p-4">
         <div class="flex items-center justify-between gap-3 mb-2"><div class="text-xs font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-wand-magic-sparkles text-emerald-600 mr-1.5"></i>คำแนะนำตามสภาพอากาศ</div><span id="weatherAdviceBadge" class="text-[9px] font-bold rounded-full px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">รอข้อมูล</span></div>
         <div id="weatherTodayAdvice" class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">กำลังดึงข้อมูลพยากรณ์สำหรับวางแผนงานในแปลงนา...</div>
         <div class="flex flex-wrap gap-2 mt-3"><button type="button" onclick="document.getElementById('weatherModal').classList.remove('hidden');refreshWeatherForecast(false)" class="rounded-lg bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 px-3 py-2 text-[10px] font-bold text-slate-700 dark:text-slate-200"><i class="fa-solid fa-calendar-days mr-1"></i>ดูรายวันแบบละเอียด</button><button type="button" onclick="switchTab('water')" class="rounded-lg bg-[#e8f0e9] dark:bg-emerald-900/30 px-3 py-2 text-[10px] font-bold text-[#456e56] dark:text-emerald-300"><i class="fa-solid fa-water mr-1"></i>บันทึกน้ำ</button><button type="button" onclick="switchTab('cost')" class="rounded-lg bg-[#f0ede3] dark:bg-amber-900/20 px-3 py-2 text-[10px] font-bold text-[#786d4b] dark:text-amber-300"><i class="fa-solid fa-coins mr-1"></i>บัญชีแปลงนา</button></div>
       </div>
       <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#f9fbf8] dark:bg-slate-800/80 p-4">
-        <div class="flex items-center justify-between gap-3 mb-2"><div class="text-xs font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-satellite-dish text-emerald-600 mr-1.5"></i>ข้อมูลผิวดินจากดาวเทียม</div><span id="satelliteSurfaceBadge" class="text-[9px] font-bold rounded-full px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">รอเชื่อมต่อ</span></div>
-        <div id="satelliteSurfaceValues" class="grid grid-cols-3 gap-2"><div class="metric-card"><div class="text-[9px] text-slate-500">NDVI</div><div id="satelliteNdvi" class="text-sm font-black text-slate-800 dark:text-white">—</div></div><div class="metric-card"><div class="text-[9px] text-slate-500">อุณหภูมิผิว</div><div id="satelliteLST" class="text-sm font-black text-slate-800 dark:text-white">—</div></div><div class="metric-card"><div class="text-[9px] text-slate-500">ความชื้นผิวดิน</div><div id="satelliteSoilMoisture" class="text-sm font-black text-slate-800 dark:text-white">—</div></div></div>
-        <p id="satelliteSurfaceNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">ปักหมุดแปลงและเชื่อม backend ที่มีสิทธิ์เข้าถึง Sentinel/Landsat ก่อนใช้งาน</p>
+        <div class="flex items-center justify-between gap-3 mb-3"><div class="text-xs font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-clock text-sky-600 mr-1.5"></i>พยากรณ์รายชั่วโมงของวันนี้</div><span id="hourlyForecastBadge" class="text-[9px] font-bold rounded-full px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">รอข้อมูล</span></div>
+        <div id="hourlyForecastScroll" class="flex gap-2 overflow-x-auto no-scrollbar pb-1"><div class="text-[11px] text-slate-500 py-3 px-1">กำลังรอข้อมูลรายชั่วโมง...</div></div>
+        <p id="hourlyForecastNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">ทุก 2 ชั่วโมง · กรอบสีเขียว = แนวโน้มปลอดฝน (โอกาสฝน &lt; 30%) ใช้ประกอบการวางแผนพ่นยา/ใส่ปุ๋ย ต้องตรวจสภาพจริงและฉลากก่อนทำงาน</p>
       </div>
       <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#f9fbf8] dark:bg-slate-800/80 p-4">
         <div class="flex items-center justify-between gap-3 mb-2"><div class="text-xs font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-brain text-violet-600 mr-1.5"></i>คาดการณ์แนวโน้มแปลง 7 วัน</div><span id="farmForecastBadge" class="text-[9px] font-bold rounded-full px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">รอข้อมูล</span></div>
         <div id="farmForecastValues" class="grid grid-cols-3 gap-2"><div class="metric-card"><div class="text-[9px] text-slate-500"><i class="fa-solid fa-droplet-slash mr-1 text-amber-500"></i>น้ำอาจไม่พอ</div><div id="farmForecastDry" class="text-sm font-black text-slate-800 dark:text-white">—</div></div><div class="metric-card"><div class="text-[9px] text-slate-500"><i class="fa-solid fa-cloud-showers-heavy mr-1 text-sky-500"></i>น้ำอาจมากเกิน</div><div id="farmForecastWet" class="text-sm font-black text-slate-800 dark:text-white">—</div></div><div class="metric-card"><div class="text-[9px] text-slate-500"><i class="fa-solid fa-temperature-high mr-1 text-rose-500"></i>อากาศร้อนจัด</div><div id="farmForecastHeat" class="text-sm font-black text-slate-800 dark:text-white">—</div></div></div>
         <p id="farmForecastNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">ประเมินจากพยากรณ์ฝน แดด และอุณหภูมิ 7 วัน เขียว = ต่ำ · เหลือง = ปานกลาง · แดง = สูง ใช้ช่วยตรวจแปลง ไม่ใช่คำสั่งอัตโนมัติ</p>
       </div>
-      <div class="dashboard-hero bg-gradient-to-br from-emerald-600 to-teal-800 rounded-3xl p-5 text-white shadow-lg relative overflow-hidden ring-4 ring-emerald-50 dark:ring-slate-800">
-        <div class="absolute -right-6 -bottom-6 opacity-10 text-9xl pointer-events-none"><i class="fa-solid fa-wheat-awn"></i></div>
-        <div class="flex justify-between items-start mb-5 relative z-10"><div><h2 class="text-xl sm:text-2xl font-black leading-tight mb-1" id="dashPlotName">กำลังโหลด...</h2><div class="text-xs text-emerald-100 font-medium" id="dashPlotDetail">กำลังโหลดข้อมูล...</div></div><button onclick="document.getElementById('plotSelectModal').classList.remove('hidden')" class="bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-2 rounded-xl text-xs font-bold transition flex items-center shadow-sm"><i class="fa-solid fa-right-left mr-1.5"></i>สลับแปลง</button></div>
-        <div class="relative z-10 bg-black/20 rounded-2xl p-3 border border-white/10"><div class="flex justify-between text-[11px] font-bold mb-1.5"><span class="text-emerald-50">อายุข้าว: <span id="dashPlotAge" class="text-white text-sm font-black mx-1">0</span> วัน</span><span class="text-emerald-50">เก็บเกี่ยวใน: <span id="dashPlotTotal" class="text-white">120</span> วัน</span></div><div class="w-full bg-black/30 rounded-full h-2.5 shadow-inner overflow-hidden"><div class="bg-gradient-to-r from-amber-300 to-amber-500 h-2.5 rounded-full transition-all duration-1000" id="dashPlotProgress" style="width:0%"></div></div></div>
-      </div>
-
-      <!-- Dashboard activity and progress metrics -->
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4">
         <div class="flex items-center justify-between gap-2 mb-3"><h2 class="text-sm font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-chart-line text-emerald-600 mr-2"></i>ภาพรวมแปลงนาวันนี้</h2><span id="dashProgressLabel" class="text-[10px] font-extrabold text-emerald-700 dark:text-emerald-300">งานเสร็จ 0%</span></div>
         <div class="h-2.5 rounded-full bg-slate-100 dark:bg-slate-700 overflow-hidden mb-3"><div id="dashTaskProgressBar" class="h-full rounded-full bg-gradient-to-r from-[#84a993] to-[#4f7966] transition-all duration-700" style="width:0%"></div></div>
@@ -152,11 +146,14 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
           <div class="metric-card"><div class="w-8 h-8 rounded-xl bg-[#e4edf0] dark:bg-sky-900/30 text-[#557c88] dark:text-sky-300 flex items-center justify-center mb-2"><i class="fa-solid fa-map-pin"></i></div><div id="dashPinnedPlots" class="text-lg font-black text-slate-800 dark:text-white">0</div><div class="text-[9px] font-bold text-slate-500 dark:text-slate-400">แปลงที่ปักหมุดแล้ว</div></div>
         </div>
       </div>
-
-      <div id="upNextWidget" class="hidden relative overflow-hidden rounded-2xl shadow-sm p-4 flex items-center"><div class="relative z-10 w-full flex items-center space-x-3"><div id="upNextIcon" class="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center text-xl text-white"><i class="fa-solid fa-bell"></i></div><div class="flex-1"><div class="text-[9px] font-black text-white/80 uppercase tracking-widest mb-0.5">งานต่อไป</div><div id="upNextTitle" class="text-white font-bold text-sm leading-tight mb-1">กำลังโหลด...</div><div id="upNextDate" class="text-white/90 font-medium text-[10px] bg-black/20 px-2 py-0.5 rounded-md inline-block">กำหนด: -</div></div></div></div>
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
         <div class="p-4 border-b border-slate-100 dark:border-slate-700 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/50"><h2 class="text-sm font-bold text-slate-800 dark:text-white flex items-center"><div class="w-7 h-7 rounded-lg bg-rice-100 dark:bg-rice-900/50 flex items-center justify-center text-rice-600 mr-2"><i class="fa-solid fa-list-check"></i></div>แผนงาน & เช็คลิสต์</h2><div class="flex items-center space-x-2"><span class="text-[10px] font-bold text-slate-500" id="autoModeLabel">โหมดออโต้</span><div class="relative inline-block w-9 align-middle"><input type="checkbox" id="autoModeToggle" onchange="toggleAutoMode()" class="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer mt-0.5 ml-0.5"><label for="autoModeToggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-slate-300 cursor-pointer"></label></div></div></div>
         <div class="p-4"><div class="flex items-center bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-xl border border-amber-200 dark:border-amber-700/30 mb-4"><div class="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2"></div><span class="text-[11px] font-bold text-amber-800 dark:text-amber-300">กรอบสีอำพันคือรอบงานปัจจุบันที่ควรตรวจสอบ</span></div><div id="checklistTimeline" class="space-y-3"></div></div>
+      </div>
+      <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-[#f9fbf8] dark:bg-slate-800/80 p-4">
+        <div class="flex items-center justify-between gap-3 mb-2"><div class="text-xs font-extrabold text-slate-800 dark:text-white"><i class="fa-solid fa-satellite-dish text-emerald-600 mr-1.5"></i>ข้อมูลผิวดินจากดาวเทียม</div><span id="satelliteSurfaceBadge" class="text-[9px] font-bold rounded-full px-2 py-1 bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300">รอเชื่อมต่อ</span></div>
+        <div id="satelliteSurfaceValues" class="grid grid-cols-3 gap-2"><div class="metric-card"><div class="text-[9px] text-slate-500">NDVI</div><div id="satelliteNdvi" class="text-sm font-black text-slate-800 dark:text-white">—</div></div><div class="metric-card"><div class="text-[9px] text-slate-500">อุณหภูมิผิว</div><div id="satelliteLST" class="text-sm font-black text-slate-800 dark:text-white">—</div></div><div class="metric-card"><div class="text-[9px] text-slate-500">ความชื้นผิวดิน</div><div id="satelliteSoilMoisture" class="text-sm font-black text-slate-800 dark:text-white">—</div></div></div>
+        <p id="satelliteSurfaceNote" class="text-[9px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed">ปักหมุดแปลงและเชื่อม backend ที่มีสิทธิ์เข้าถึง Sentinel/Landsat ก่อนใช้งาน</p>
       </div>
     </section>
 
@@ -208,12 +205,13 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
 
     <!-- TAB 2: WATER & CHEMICAL LOG -->
     <section id="tab-water" class="tab-pane space-y-4">
-      <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5"><h2 class="text-sm font-bold mb-4 flex items-center"><span class="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/50 text-sky-600 flex items-center justify-center mr-2"><i class="fa-solid fa-water"></i></span>ประวัติการจัดการน้ำในแปลง</h2>
-        <form onsubmit="addWaterLog(event)" class="space-y-4"><div class="grid grid-cols-3 gap-2">
-          <label class="cursor-pointer"><input type="radio" name="waterLevel" value="แห้ง (แกล้งข้าว)" class="peer sr-only" required checked><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-900/20 rounded-2xl p-3 text-center"><i class="fa-solid fa-crack text-amber-500 text-2xl mb-1.5"></i><div class="text-[10px] font-bold">ปล่อยแห้ง</div></div></label>
-          <label class="cursor-pointer"><input type="radio" name="waterLevel" value="ชื้นพอดี (0 ซม.)" class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 rounded-2xl p-3 text-center"><i class="fa-solid fa-seedling text-emerald-500 text-2xl mb-1.5"></i><div class="text-[10px] font-bold">ชื้นพอดี</div></div></label>
-          <label class="cursor-pointer"><input type="radio" name="waterLevel" value="ขังน้ำ (+5 ซม.)" class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-sky-500 peer-checked:bg-sky-50 dark:peer-checked:bg-sky-900/20 rounded-2xl p-3 text-center"><i class="fa-solid fa-water text-sky-500 text-2xl mb-1.5"></i><div class="text-[10px] font-bold">ขังน้ำ</div></div></label>
-        </div><button type="submit" class="w-full bg-slate-800 dark:bg-sky-600 text-white font-bold py-3 rounded-xl text-sm shadow-md">บันทึกระดับน้ำวันนี้</button></form><div class="mt-5 border-t border-slate-100 dark:border-slate-700 pt-4"><div id="waterHistoryList" class="space-y-2"></div></div>
+      <div id="waterLogCard" class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5"><h2 class="text-sm font-bold mb-1 flex items-center"><span class="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/50 text-sky-600 flex items-center justify-center mr-2"><i class="fa-solid fa-water"></i></span>น้ำในนาวันนี้เป็นอย่างไร?</h2>
+        <p class="text-[10px] text-slate-500 dark:text-slate-400 mb-3">เลือกสิ่งที่เห็นจริงในแปลง แล้วกดบันทึก ระบบจะบอกทันทีว่าต้องทำอะไร (บันทึกซ้ำในวันเดียวกันจะทับของเดิม)</p>
+        <form onsubmit="addWaterLog(event)" class="space-y-3"><div class="grid grid-cols-2 gap-2"><label class="cursor-pointer"><input type="radio" name="waterLevel" value="ดินแห้งแตก" class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-amber-500 peer-checked:bg-amber-50 dark:peer-checked:bg-amber-900/20 rounded-2xl p-3 text-center h-full"><i class="fa-solid fa-sun text-amber-500 text-2xl mb-1.5"></i><div class="text-[11px] font-bold">ดินแห้งแตก</div><div class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">ผิวดินแตกระแหง ไม่มีความชื้น</div></div></label><label class="cursor-pointer"><input type="radio" name="waterLevel" value="ดินเปียกแฉะ ไม่มีน้ำขัง" class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-emerald-500 peer-checked:bg-emerald-50 dark:peer-checked:bg-emerald-900/20 rounded-2xl p-3 text-center h-full"><i class="fa-solid fa-seedling text-emerald-500 text-2xl mb-1.5"></i><div class="text-[11px] font-bold">ดินเปียกแฉะ</div><div class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">เหยียบแล้วจมแต่ไม่มีน้ำขัง</div></div></label><label class="cursor-pointer"><input type="radio" name="waterLevel" value="น้ำขังตื้น 1–5 ซม." class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-sky-500 peer-checked:bg-sky-50 dark:peer-checked:bg-sky-900/20 rounded-2xl p-3 text-center h-full"><i class="fa-solid fa-droplet text-sky-500 text-2xl mb-1.5"></i><div class="text-[11px] font-bold">น้ำขังตื้น</div><div class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">น้ำคลุมดิน สูงไม่เกิน 5 ซม. (ราว 3 นิ้วมือ)</div></div></label><label class="cursor-pointer"><input type="radio" name="waterLevel" value="น้ำลึกเกิน 5 ซม." class="peer sr-only" required><div class="bg-slate-50 dark:bg-slate-700 border-2 border-slate-200 dark:border-slate-600 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 dark:peer-checked:bg-indigo-900/20 rounded-2xl p-3 text-center h-full"><i class="fa-solid fa-water text-indigo-500 text-2xl mb-1.5"></i><div class="text-[11px] font-bold">น้ำลึกเกิน 5 ซม.</div><div class="text-[9px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">น้ำสูงกว่า 3 นิ้วมือ</div></div></label></div>
+          <label class="flex items-center gap-2 text-[10px] font-bold text-slate-600 dark:text-slate-300"><input type="checkbox" id="waterAltDry" class="w-4 h-4 accent-amber-600">ตั้งใจปล่อยแห้งเพื่อแกล้งข้าว (ใช้เมื่อเลือก “ดินแห้งแตก”)</label>
+          <button type="submit" class="w-full bg-slate-800 dark:bg-sky-600 text-white font-bold py-3 rounded-xl text-sm shadow-md">บันทึกและดูคำตอบ</button></form>
+        <div id="waterAdviceBox" class="mt-4 rounded-2xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800/60 p-3 text-xs"></div>
+        <div class="mt-5 border-t border-slate-100 dark:border-slate-700 pt-4"><div class="text-[10px] font-bold text-slate-500 mb-2">ประวัติที่บันทึก</div><div id="waterHistoryList" class="space-y-2"></div></div>
       </div><!-- 1) ระบบคำนวณสูตรผสมปุ๋ยเมื่อได้ผลเทสดิน (อยู่ในหน้าน้ำ/ยา) -->
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5">
         <div class="flex items-center justify-between mb-4">
@@ -254,7 +252,7 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
         </div>
       </div>
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5">
-        <h2 class="text-sm font-bold flex items-center mb-4"><span class="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-900/50 text-teal-600 flex items-center justify-center mr-2"><i class="fa-solid fa-vial"></i></span>วิเคราะห์ pH ดิน & ความชื้น</h2>
+        <h2 class="text-sm font-bold flex items-center mb-4"><span class="w-7 h-7 rounded-lg bg-teal-100 dark:bg-teal-900/50 text-teal-600 flex items-center justify-center mr-2"><i class="fa-solid fa-vial"></i></span>วิเคราะห์ pH ดิน</h2>
         <div class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3">
           <div>
             <label for="soilPhInput" class="block text-[10px] font-bold text-slate-500 mb-1">ค่า pH ดินที่วัดได้ (ช่วง 3.0–10.0)</label>
@@ -262,11 +260,7 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
           </div>
           <div id="soilPhResultBox" class="rounded-xl bg-white dark:bg-slate-800 border border-teal-200 dark:border-teal-800/60 p-3 text-xs space-y-2"></div>
         </div>
-        <div class="mt-4 bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700">
-          <div class="text-[11px] font-extrabold text-slate-800 dark:text-white mb-2"><i class="fa-solid fa-droplet text-sky-500 mr-1.5"></i>ความชื้น: ควรเติมน้ำเข้าหรือไม่</div>
-          <div id="waterAdviceBox" class="rounded-xl bg-white dark:bg-slate-800 border border-sky-200 dark:border-sky-800/60 p-3 text-xs"></div>
-        </div>
-      </div>
+              </div>
       <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5"><h2 class="text-sm font-bold flex items-center mb-4"><span class="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/50 text-purple-600 flex items-center justify-center mr-2"><i class="fa-solid fa-spray-can"></i></span>บันทึกพ่นยา & ระยะปลอดภัย</h2>
         <form onsubmit="addChemLog(event)" class="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 space-y-3"><div class="grid grid-cols-2 gap-3"><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ประเภท</label><select id="chemTypeInput" class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold"><option value="ฮอร์โมน/อาหารเสริม">🌱 ฮอร์โมน</option><option value="ยาฆ่าหญ้า (วัชพืช)">🍂 ยาฆ่าหญ้า</option><option value="ยาป้องกันโรค/แมลง">🐛 ป้องกันโรค/แมลง</option></select></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ชื่อสารเคมี</label><input list="chemPresets" id="chemNameInput" placeholder="เช่น 2,4-D, MCPA" required class="w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-xs font-bold"><datalist id="chemPresets"><option value="2,4-D (คุม-ฆ่าหญ้าใบกว้าง)"><option value="MCPA (หญ้าหนวดปลาดุก/ผักบุ้ง)"><option value="ไอโซโพรไทโอเลน (โรคไหม้)"><option value="อะมิโน + สาหร่ายสกัด"></datalist></div></div>
           <label class="flex items-center justify-between bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-600 p-2.5 rounded-lg"><span class="text-xs font-bold"><i class="fa-solid fa-helicopter text-slate-400 mr-2"></i>พ่นด้วยโดรนเกษตร</span><input type="checkbox" id="droneToggle" class="w-4 h-4"></label>
@@ -304,7 +298,7 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
       <div class="mb-4 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 bg-gradient-to-br from-[#f4faf6] to-[#e8f3ec] dark:from-slate-900 dark:to-slate-800/90 p-3.5 shadow-sm">
         <div class="flex items-center justify-between gap-2 mb-2">
           <div class="text-xs font-extrabold text-emerald-900 dark:text-emerald-300">
-            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1.5"></i>คาดการณ์ผลผลิต & รายได้จากดาวเทียม (NDVI)
+            <i class="fa-solid fa-satellite-dish text-emerald-600 mr-1.5"></i>คาดการณ์ผลผลิต & รายได้จากดาวเทียม (NDVI) · ตัวอย่างเบื้องต้น
           </div>
           <span id="yieldEstBadge" class="text-[9px] font-bold rounded-full px-2 py-0.5 bg-white dark:bg-slate-700 text-emerald-700 dark:text-emerald-300 shadow-sm">รอข้อมูล</span>
         </div>
@@ -339,7 +333,17 @@ html.dark .hour-card.dry{background:#16291f;border-color:#2f6b49}
     <!-- TAB 5: SETTINGS -->
     <section id="tab-settings" class="tab-pane space-y-4"><div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5"><div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3 mb-4 gap-2"><h2 class="text-sm font-bold flex items-center"><span class="w-7 h-7 rounded-lg bg-slate-100 dark:bg-slate-700 flex items-center justify-center mr-2"><i class="fa-solid fa-sliders"></i></span>ตั้งค่าแปลงนาปัจจุบัน</h2><button onclick="deletePlot()" class="text-rose-600 bg-rose-50 dark:bg-rose-900/30 px-3 py-1.5 rounded-lg text-[10px] font-bold"><i class="fa-solid fa-trash-can mr-1"></i>ลบแปลงนี้</button></div>
       <form onsubmit="savePlotSettings(event)" class="space-y-3"><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ชื่อแปลงนา</label><input type="text" id="setPlotName" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"></div><div class="grid grid-cols-3 gap-2"><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ไร่</label><input type="number" id="setRai" min="0" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">งาน</label><input type="number" id="setNgan" min="0" max="3" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ตร.ว.</label><input type="number" id="setWah" min="0" max="99" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"></div></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">พันธุ์ข้าว</label><select id="setVariety" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"></select></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">ชนิดดิน (ช่วยคำนวณสูตรปุ๋ย)</label><select id="setSoilType" class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"><option value="unknown">ยังไม่ทราบชนิดดิน — แสดงตัวเลือก</option><option value="clay">ดินเหนียว / ดินร่วนเหนียว</option><option value="sandy">ดินร่วน / ดินร่วนทราย / ดินทราย</option></select><p class="text-[9px] text-slate-500 mt-1">เลือกตามสภาพแปลงจริง หากไม่แน่ใจให้คงค่าเดิมและตรวจผลวิเคราะห์ดินก่อนใส่ปุ๋ย</p></div><div><label class="block text-[10px] font-bold text-slate-500 mb-1">วันหว่าน / ปลูก (Day 0)</label><input type="date" id="setSowDate" required class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl px-3 py-2.5 text-sm font-bold"></div><div class="bg-emerald-50 dark:bg-emerald-900/20 p-3 rounded-xl border border-emerald-200 dark:border-emerald-800"><div class="text-xs font-bold text-emerald-800 dark:text-emerald-300 mb-1"><i class="fa-solid fa-map-pin mr-1"></i>พิกัดหมุดของแปลงนี้</div><div id="settingsPinStatus" class="text-[11px] text-slate-600 dark:text-slate-300">ยังไม่ได้ปักหมุด</div><button type="button" onclick="switchTab('map');showMsg('แตะตำแหน่งบนแผนที่เพื่อปักหมุดแปลงนี้')" class="mt-2 bg-white dark:bg-slate-800 border border-emerald-300 dark:border-emerald-700 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold px-3 py-2 rounded-lg"><i class="fa-solid fa-map-location-dot mr-1"></i>ไปปักหมุดบนแผนที่</button></div><button type="submit" class="w-full bg-slate-800 dark:bg-slate-600 text-white font-bold py-3 rounded-xl shadow-md">บันทึกการเปลี่ยนแปลง</button></form>
-    </div></section>
+    </div>
+    <div class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm p-4 sm:p-5 mt-4">
+      <h2 class="text-sm font-bold flex items-center mb-2"><span class="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/50 text-sky-600 flex items-center justify-center mr-2"><i class="fa-solid fa-floppy-disk"></i></span>สำรอง / นำเข้าข้อมูล</h2>
+      <p class="text-[10px] leading-relaxed text-slate-500 dark:text-slate-400 mb-3">ไฟล์สำรองรวมทุกแปลง บัญชี ประวัติน้ำ/ยา และรูปในสมุดภาพ (รูปเก็บเฉพาะในเครื่องนี้ ไม่ซิงก์ขึ้นคลาวด์ จึงควรสำรองไว้ก่อนล้างข้อมูลเบราว์เซอร์)</p>
+      <div class="grid grid-cols-2 gap-2">
+        <button type="button" onclick="exportFarmData()" class="map-tool-btn"><i class="fa-solid fa-download mr-1"></i>ส่งออกไฟล์สำรอง</button>
+        <label class="map-tool-btn text-center cursor-pointer"><i class="fa-solid fa-upload mr-1"></i>นำเข้าไฟล์สำรอง<input type="file" accept="application/json,.json" class="hidden" onchange="importFarmData(event)"></label>
+      </div>
+      <p class="text-[9px] text-amber-700 dark:text-amber-300 mt-2">การนำเข้าจะแทนที่ข้อมูลแปลงทั้งหมดในบัญชีนี้ (ระบบถามยืนยันก่อน)</p>
+    </div>
+  </section>
   </main>
 
   <!-- Bottom navigation -->
@@ -664,9 +668,9 @@ function useMyLocation(){if(!navigator.geolocation){showMsg('เบราว์�
 function updateMapStatus(){const p=getP();const a=document.getElementById('plotCoordinateStatus'),b=document.getElementById('mapSelectedPlot'),c=document.getElementById('settingsPinStatus');if(!p){if(a)a.textContent='เพิ่มแปลงนาเพื่อเริ่มปักหมุด';if(b)b.textContent='ยังไม่มีแปลงที่เลือก';if(c)c.textContent='ยังไม่มีแปลงนา';return;}const pinned=Number.isFinite(Number(p.lat))&&Number.isFinite(Number(p.lng))&&p.lat!==null&&p.lng!==null;const text=pinned?`ละติจูด ${Number(p.lat).toFixed(6)}, ลองจิจูด ${Number(p.lng).toFixed(6)}`:'ยังไม่ได้ปักหมุด — เลือกโหมดปักหมุดแล้วแตะบนแผนที่';if(a)a.textContent=text;if(b)b.textContent='แปลงที่เลือก: '+p.name;if(c)c.textContent=pinned?text:'ยังไม่ได้ปักหมุด';}
 
 // Water and chemical logs
-function addWaterLog(e){e.preventDefault();const p=getP();const level=document.querySelector('input[name="waterLevel"]:checked')?.value;if(!level)return;p.wLogs.push({id:Date.now(),l:level,d:dateISO()});save();showMsg('บันทึกระดับน้ำแล้ว');}
+function addWaterLog(e){e.preventDefault();const p=getP();let level=document.querySelector('input[name="waterLevel"]:checked')?.value;if(!level)return showMsg('เลือกสภาพน้ำในนาก่อน');if(level==='ดินแห้งแตก'&&document.getElementById('waterAltDry')?.checked)level+=' (ตั้งใจแกล้งข้าว)';const today=dateISO();p.wLogs=(p.wLogs||[]).filter(w=>w.d!==today);p.wLogs.push({id:Date.now(),l:level,d:today});save();const f=e.target;if(f&&f.reset)f.reset();showMsg('บันทึกแล้ว ดูคำตอบด้านล่าง');setTimeout(()=>document.getElementById('waterAdviceBox')?.scrollIntoView({behavior:'smooth',block:'nearest'}),150);}
 function addChemLog(e){e.preventDefault();const p=getP();p.cLogs.push({id:Date.now(),t:document.getElementById('chemTypeInput').value,n:document.getElementById('chemNameInput').value.trim(),d:document.getElementById('chemDateInput').value,p:parseInt(document.getElementById('chemPhiInput').value,10)||0,dr:document.getElementById('droneToggle').checked});save();e.target.reset();document.getElementById('chemDateInput').value=dateISO();showMsg('บันทึกประวัติการพ่นแล้ว');}
-function renderLogs(){const p=getP();let wh='';(p.wLogs||[]).slice().reverse().forEach(w=>{let ic='fa-water',col='text-sky-500 bg-sky-100';if(w.l.includes('แห้ง')){ic='fa-crack';col='text-amber-500 bg-amber-100';}else if(w.l.includes('ชื้น')){ic='fa-seedling';col='text-emerald-500 bg-emerald-100';}wh+=`<div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl p-3 flex justify-between items-center text-xs"><div class="flex items-center font-bold"><div class="w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${col}"><i class="fa-solid ${ic}"></i></div>${escapeHTML(w.l)}</div><div class="text-[10px] text-slate-400">${escapeHTML(w.d)}</div></div>`;});document.getElementById('waterHistoryList').innerHTML=wh||'<div class="text-slate-400 text-xs text-center py-2">ยังไม่มีประวัติการจัดการน้ำ</div>';let ch='';(p.cLogs||[]).slice().reverse().forEach(c=>{const safeDate=addD(c.d,Number(c.p)||0);const diff=Math.ceil((safeDate-new Date())/86400000);const safe=diff<=0;let ic='fa-flask',col='bg-slate-100 text-slate-600';if(c.t.includes('ฮอร์โมน')){ic='fa-leaf';col='bg-green-100 text-green-600';}else if(c.t.includes('ฆ่าหญ้า')){ic='fa-skull-crossbones';col='bg-amber-100 text-amber-600';}else if(c.t.includes('โรค')){ic='fa-bug';col='bg-rose-100 text-rose-600';}ch+=`<div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl p-3 flex justify-between items-center text-xs mb-2"><div class="flex items-center"><div class="w-9 h-9 rounded-lg ${col} flex items-center justify-center mr-3 text-sm"><i class="fa-solid ${ic}"></i></div><div><div class="font-extrabold text-xs">${escapeHTML(c.n)}</div><div class="text-[9px] text-slate-500 mt-0.5">${escapeHTML(c.t)} | พ่น: ${escapeHTML(c.d)} ${c.dr?'| โดรน':''}</div></div></div><div class="text-right"><span class="px-2 py-1 rounded-md font-bold text-[9px] ${safe?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${safe?'ครบวันที่บันทึกไว้':`รอ ${diff} วัน`}</span></div></div>`;});document.getElementById('chemHistoryList').innerHTML=ch||'<div class="text-slate-400 text-xs text-center py-2">ยังไม่มีประวัติพ่นยา</div>';}
+function renderLogs(){const p=getP();let wh='';(p.wLogs||[]).slice().reverse().forEach(w=>{let ic='fa-water',col='text-sky-500 bg-sky-100';if(w.l.includes('แห้ง')){ic='fa-crack';col='text-amber-500 bg-amber-100';}else if(w.l.includes('ชื้น')||w.l.includes('แฉะ')){ic='fa-seedling';col='text-emerald-500 bg-emerald-100';}wh+=`<div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl p-3 flex justify-between items-center text-xs"><div class="flex items-center font-bold"><div class="w-8 h-8 rounded-lg flex items-center justify-center mr-3 ${col}"><i class="fa-solid ${ic}"></i></div>${escapeHTML(w.l)}</div><div class="text-[10px] text-slate-400">${escapeHTML(w.d)}</div></div>`;});document.getElementById('waterHistoryList').innerHTML=wh||'<div class="text-slate-400 text-xs text-center py-2">ยังไม่มีประวัติการจัดการน้ำ</div>';let ch='';(p.cLogs||[]).slice().reverse().forEach(c=>{const safeDate=addD(c.d,Number(c.p)||0);const diff=Math.ceil((safeDate-new Date())/86400000);const safe=diff<=0;let ic='fa-flask',col='bg-slate-100 text-slate-600';if(c.t.includes('ฮอร์โมน')){ic='fa-leaf';col='bg-green-100 text-green-600';}else if(c.t.includes('ฆ่าหญ้า')){ic='fa-skull-crossbones';col='bg-amber-100 text-amber-600';}else if(c.t.includes('โรค')){ic='fa-bug';col='bg-rose-100 text-rose-600';}ch+=`<div class="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 rounded-xl p-3 flex justify-between items-center text-xs mb-2"><div class="flex items-center"><div class="w-9 h-9 rounded-lg ${col} flex items-center justify-center mr-3 text-sm"><i class="fa-solid ${ic}"></i></div><div><div class="font-extrabold text-xs">${escapeHTML(c.n)}</div><div class="text-[9px] text-slate-500 mt-0.5">${escapeHTML(c.t)} | พ่น: ${escapeHTML(c.d)} ${c.dr?'| โดรน':''}</div></div></div><div class="text-right"><span class="px-2 py-1 rounded-md font-bold text-[9px] ${safe?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">${safe?'ครบวันที่บันทึกไว้':`รอ ${diff} วัน`}</span></div></div>`;});document.getElementById('chemHistoryList').innerHTML=ch||'<div class="text-slate-400 text-xs text-center py-2">ยังไม่มีประวัติพ่นยา</div>';}
 
 // Research-informed rice planting calendar by region and variety.
 // Month bands represent broad planting-season windows from published regional rice calendars;
@@ -910,15 +914,21 @@ function renderSatelliteYieldEstimation() {
   const rawNdvi = satelliteSurfaceData?.ndvi;
   const ndvi = (rawNdvi !== null && rawNdvi !== undefined && Number.isFinite(Number(rawNdvi))) ? Number(rawNdvi) : null;
 
+  const vDays = (RICE_V[p.variety] && RICE_V[p.variety].days) || 120;
+  const ageD = p.sowDate ? Math.floor((new Date() - new Date(p.sowDate + 'T00:00:00')) / 86400000) : null;
+  const earlyStage = ageD !== null && ageD >= 0 && ageD / vDays < 0.4;
+  const lateStage = ageD !== null && ageD / vDays >= 0.7;
   let factor = 1.0;
   let statusText = 'ประเมินตามเกณฑ์พันธุ์';
   let badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200';
 
-  if (ndvi !== null) {
+  if (ndvi !== null && earlyStage) {
+    statusText = `ข้าวยังอ่อน (NDVI ${ndvi.toFixed(2)}) ใช้ค่ามาตรฐานพันธุ์`; badgeClass = 'bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200';
+  } else if (ndvi !== null) {
     if (ndvi < 0.25) { factor = 0.55; statusText = `NDVI ต่ำ (${ndvi.toFixed(2)})`; badgeClass = 'bg-rose-100 text-rose-800'; }
     else if (ndvi < 0.45) { factor = 0.80; statusText = `NDVI ปานกลาง (${ndvi.toFixed(2)})`; badgeClass = 'bg-amber-100 text-amber-800'; }
     else if (ndvi < 0.65) { factor = 1.00; statusText = `NDVI สมบูรณ์ดี (${ndvi.toFixed(2)})`; badgeClass = 'bg-emerald-100 text-emerald-800'; }
-    else { factor = 1.12; statusText = `NDVI หนาแน่นมาก (${ndvi.toFixed(2)})`; badgeClass = 'bg-emerald-200 text-emerald-900'; }
+    else { factor = lateStage ? 1.0 : 1.12; statusText = `NDVI หนาแน่นมาก (${ndvi.toFixed(2)})`; badgeClass = 'bg-emerald-200 text-emerald-900'; }
   }
 
   const estPerRai = Math.round(baseYield * factor);
@@ -939,6 +949,8 @@ function renderSatelliteYieldEstimation() {
       ? `คำนวณจาก NDVI ล่าสุด (${ndvi.toFixed(2)}) · พันธุ์ ${RICE_V[p.variety]?.name || ''} พื้นที่ ${fmtNum(rai, 2)} ไร่ (รวม ~${fmtNum(estTotalKg)} กก.)`
       : `ยังไม่มีค่า NDVI ดาวเทียม · แสดงค่ามาตรฐานพันธุ์ ${RICE_V[p.variety]?.name || ''} บนพื้นที่ ${fmtNum(rai, 2)} ไร่ (รวม ~${fmtNum(estTotalKg)} กก.)`;
   }
+  const stageNote = earlyStage ? ' · ข้าวยังอายุน้อย NDVI ยังบอกผลผลิตไม่ได้' : lateStage ? ' · ช่วงข้าวโตเต็มที่ NDVI อิ่มตัว จึงไม่ปรับเพิ่ม' : '';
+  if (elNote) elNote.textContent += stageNote + ' · ตัวอย่างเบื้องต้น ไม่ใช่ค่ารับรองผลผลิตจริง';
 }
 
 function fillExpectedYieldToForm() {
@@ -947,7 +959,7 @@ function fillExpectedYieldToForm() {
   const assumed = document.getElementById('yieldAssumedPrice')?.value || 10.5;
   if (yInput && _lastEstimatedTotalKg > 0) yInput.value = _lastEstimatedTotalKg;
   if (pInput) pInput.value = assumed;
-  showMsg('ดึงตัวเลขผลผลิตลงฟอร์มบันทึกขายข้าวแล้ว');
+  showMsg('ดึงค่าประมาณลงฟอร์มแล้ว กรุณาแก้เป็นตัวเลขขายจริงก่อนบันทึก');
 }
 
 // ============================================================================
@@ -1081,7 +1093,7 @@ function computeWaterAdvice(){
   // latest water log
   const logs=Array.isArray(p.wLogs)?p.wLogs:[];const last=logs.length?logs[logs.length-1]:null;
   let level=null,logAge=null;
-  if(last){const t=String(last.l||'');level=t.includes('แห้ง')?'dry':t.includes('ชื้น')?'moist':t.includes('ขัง')?'flood':null;logAge=Math.round((today-new Date(last.d+'T00:00:00'))/86400000);if(!Number.isFinite(logAge))logAge=null;}
+  if(last){const t=String(last.l||'');level=t.includes('แห้ง')?'dry':(t.includes('ชื้น')||t.includes('แฉะ'))?'moist':t.includes('ลึก')?'deep':t.includes('ขัง')?'flood':null;logAge=Math.round((today-new Date(last.d+'T00:00:00'))/86400000);if(!Number.isFinite(logAge))logAge=null;}
   const logFresh=level&&logAge!==null&&logAge<=7;
   // forecast rain (next 3 days)
   const daily=weatherData&&weatherData.daily;let rain3=null,probMax=null;
@@ -1090,31 +1102,34 @@ function computeWaterAdvice(){
   }
   const rainy=rain3!==null&&(rain3>=10||(rain3>=5&&probMax>=70));
   const sm=satelliteSurfaceData&&satelliteSurfaceData.soilMoisture!=null&&Number.isFinite(Number(satelliteSurfaceData.soilMoisture))?Number(satelliteSurfaceData.soilMoisture):null;
-  const levelText={dry:'ปล่อยแห้ง',moist:'ชื้นพอดี',flood:'ขังน้ำ'}[level];
+  const levelText={dry:'ดินแห้งแตก',moist:'ดินเปียกแฉะ',flood:'น้ำขังตื้น',deep:'น้ำลึกเกิน 5 ซม.'}[level];
   const reasons=[];let status,tone,action='';
   const target={seedling:'ให้ดินชื้นถึงมีน้ำเคลือบผิว ยังไม่ต้องขังลึก',tillering:'รักษาน้ำขังตื้นประมาณ 3–5 ซม.',booting:'รักษาน้ำขังประมาณ 3–5 ซม. ระยะนี้อย่าให้ขาดน้ำ',flowering:'รักษาน้ำขังประมาณ 3–5 ซม. ระยะนี้อย่าให้ขาดน้ำ'}[stage]||'';
   if(stage==='pre'){
     status='ยังไม่เริ่มปลูก';tone='slate';reasons.push('ยังไม่ถึงวันหว่าน/ปักดำตามวันที่ในหน้าตั้งค่า การประเมินน้ำจะเริ่มเมื่อเริ่มปลูก');
   }else if(stage==='harvest'){
-    if(level==='flood'&&logFresh){status='ควรระบายน้ำ';tone='rose';}else{status='ไม่ต้องเติมน้ำ';tone='green';}
+    if((level==='flood'||level==='deep')&&logFresh){status='ระบายน้ำออก';tone='rose';}else{status='ไม่ต้องเติมน้ำ';tone='green';}
     reasons.push(`อีกประมาณ ${remaining} วันถึงกำหนดเก็บเกี่ยว ควรระบายน้ำให้ดินแห้งพอเหมาะกับการเก็บเกี่ยวและไม่เติมน้ำเพิ่ม`);
     if(rain3!==null&&rain3>=10)reasons.push(`ฝนคาด ${fmtNum(rain3,1)} มม. ใน 3 วันข้างหน้า ดินอาจแห้งช้า ควรวางแผนระบายน้ำและนัดรถเกี่ยวล่วงหน้า`);
   }else if(!logFresh){
-    status='ต้องบันทึกระดับน้ำ';tone='amber';
+    status='บันทึกสภาพนาก่อน';tone='amber';
     reasons.push(last?`บันทึกระดับน้ำล่าสุดเมื่อ ${logAge} วันก่อน เก่าเกินกว่าจะใช้ประเมิน`:'ยังไม่มีบันทึกระดับน้ำของแปลงนี้');
-    reasons.push('บันทึกระดับน้ำวันนี้ที่การ์ด “ประวัติการจัดการน้ำในแปลง” ด้านบน เพื่อให้ระบบประเมินได้แม่นขึ้น');
+    reasons.push('เลือกสภาพน้ำในนาด้านบนแล้วกดบันทึก ระบบจะบอกคำตอบทันที');
     if(rain3!==null&&rain3>=25)reasons.push('ฝนคาดมาก ระวังน้ำล้นแปลง ตรวจทางระบายน้ำ');
+  }else if(level==='deep'){
+    if(rain3!==null&&rain3>=25){status='ระบายน้ำออก';tone='rose';reasons.push(`น้ำลึกเกิน 5 ซม. และฝนคาด ${fmtNum(rain3,1)} มม. ใน 3 วันข้างหน้า ควรระบายน้ำออกก่อน ไม่ให้ท่วมยอดข้าวหรือน้ำล้นพาปุ๋ยออกนอกแปลง`);}
+    else{status='ระบายน้ำออก';tone='amber';reasons.push('น้ำลึกเกิน 5 ซม. ควรลดระดับให้เหลือประมาณ 3–5 ซม. (ถ้าน้ำท่วมยอดข้าวให้รีบระบาย)');}
   }else if(level==='flood'){
-    if(rain3!==null&&rain3>=25){status='ควรระบายน้ำ';tone='rose';reasons.push(`แปลงขังน้ำอยู่แล้ว และฝนคาด ${fmtNum(rain3,1)} มม. ใน 3 วันข้างหน้า ควรลดระดับน้ำให้มีที่รับฝน ไม่ให้ท่วมยอดข้าวหรือน้ำล้นพาปุ๋ยออกนอกแปลง`);}
-    else{status='ยังไม่ต้องเติม';tone='green';reasons.push('แปลงมีน้ำขังอยู่แล้ว ยังไม่ต้องเติมน้ำ');}
+    if(rain3!==null&&rain3>=25){status='ระบายน้ำออก';tone='rose';reasons.push(`แปลงขังน้ำอยู่แล้ว และฝนคาด ${fmtNum(rain3,1)} มม. ใน 3 วันข้างหน้า ควรลดระดับน้ำให้มีที่รับฝน ไม่ให้ท่วมยอดข้าวหรือน้ำล้นพาปุ๋ยออกนอกแปลง`);}
+    else{status='ยังไม่ต้องทำอะไร';tone='green';reasons.push('แปลงมีน้ำขังอยู่แล้ว ยังไม่ต้องเติมน้ำ');}
   }else if(level==='moist'){
-    if(critical&&(rain3===null||rain3<5)){status='ควรเติมน้ำ';tone='amber';reasons.push('ดินชื้นพอดี แต่ระยะนี้ขาดน้ำไม่ได้ และฝนที่คาดมีน้อย ควรเติมน้ำให้ขังก่อนดินแห้ง');action=target;}
-    else if(rainy){status='ยังไม่ต้องเติม';tone='green';reasons.push('ดินชื้นพอดี และมีฝนคาดว่าจะช่วยเติมน้ำ');}
-    else{status='รอดูฝน';tone='sky';reasons.push('ดินชื้นพอดี ยังไม่เร่งเติม ตรวจซ้ำใน 1–2 วัน หากผิวดินเริ่มแตกหรือแห้งให้เติมน้ำ');action=target;}
+    if(critical&&(rain3===null||rain3<5)){status='เติมน้ำวันนี้';tone='amber';reasons.push('ดินเปียกแฉะแต่ไม่มีน้ำขัง และระยะนี้ขาดน้ำไม่ได้ และฝนที่คาดมีน้อย ควรเติมน้ำให้ขังก่อนดินแห้ง');action=target;}
+    else if(rainy){status='ยังไม่ต้องทำอะไร';tone='green';reasons.push('ดินเปียกแฉะ และมีฝนคาดว่าจะช่วยเติมน้ำ');}
+    else{status='รอฝน 1–2 วัน แล้วเช็กใหม่';tone='sky';reasons.push('ดินเปียกแฉะ ยังไม่เร่งเติม ตรวจซ้ำใน 1–2 วัน หากผิวดินเริ่มแตกหรือแห้งให้เติมน้ำ');action=target;}
   }else{ // dry
-    if(rainy&&!critical){status='รอดูฝน';tone='sky';reasons.push('แปลงแห้ง แต่ฝนที่คาดน่าจะช่วยได้ หากฝนไม่มาภายใน 1–2 วันให้เติมน้ำ');action=target;}
-    else{status='ควรเติมน้ำ';tone='amber';reasons.push(critical?'แปลงแห้งในระยะที่ขาดน้ำไม่ได้ ควรเติมน้ำโดยเร็ว':'แปลงแห้งและยังไม่มีฝนที่น่าจะช่วยได้พอ ควรเติมน้ำ');action=target;
-      if(String(last.l).includes('แกล้งข้าว')&&stage==='tillering')reasons.push('หากตั้งใจแกล้งข้าวช่วงแตกกอ ให้กำหนดช่วงสั้น ๆ และเติมน้ำก่อนเข้าระยะตั้งท้อง');}
+    if(rainy&&!critical){status='รอฝน 1–2 วัน แล้วเช็กใหม่';tone='sky';reasons.push('แปลงแห้ง แต่ฝนที่คาดน่าจะช่วยได้ หากฝนไม่มาภายใน 1–2 วันให้เติมน้ำ');action=target;}
+    else{status='เติมน้ำวันนี้';tone='amber';reasons.push(critical?'แปลงแห้งในระยะที่ขาดน้ำไม่ได้ ควรเติมน้ำโดยเร็ว':'แปลงแห้งและยังไม่มีฝนที่น่าจะช่วยได้พอ ควรเติมน้ำ');action=target;
+      if(String(last&&last.l).includes('แกล้งข้าว')&&stage==='tillering')reasons.push('หากตั้งใจแกล้งข้าวช่วงแตกกอ ให้กำหนดช่วงสั้น ๆ และเติมน้ำก่อนเข้าระยะตั้งท้อง');}
   }
   const ctx=[`ระยะข้าว: ${stageLabel}${age>=0?` (อายุประมาณ ${age} วัน)`:''}`];
   if(logFresh)ctx.push(`บันทึกระดับน้ำล่าสุด: ${levelText}${logAge===0?' (วันนี้)':` (${logAge} วันก่อน)`}`);
@@ -1127,11 +1142,19 @@ function computeWaterAdvice(){
   }
   return{status,tone,reasons,ctx,action};
 }
+function renderDashWaterChip(r){
+  const el=document.getElementById('dashWaterAdvice');if(!el)return;
+  if(!r){el.innerHTML='';return;}
+  const needLog=r.status==='บันทึกสภาพนาก่อน';
+  el.innerHTML=`<div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2"><i class="fa-solid fa-droplet text-sky-500 mr-1.5"></i>วันนี้ต้องทำอะไรกับน้ำ</div><div class="rounded-xl px-3 py-3 text-center ${toneBadgeClass(r.tone)}"><div class="text-base font-black">${escapeHTML(r.status)}</div></div><div class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed mt-2">${escapeHTML(r.reasons[0]||'')}</div><button type="button" onclick="goToWaterLog()" class="mt-2 w-full rounded-xl bg-[#e8f0e9] dark:bg-emerald-900/30 px-3 py-2.5 text-[11px] font-bold text-[#456e56] dark:text-emerald-300"><i class="fa-solid fa-pen mr-1"></i>${needLog?'บันทึกสภาพนาตอนนี้':'บันทึกสภาพน้ำ / ดูรายละเอียด'}</button>`;
+}
+function goToWaterLog(){switchTab('water');setTimeout(()=>{const c=document.getElementById('waterLogCard');if(c)c.scrollIntoView({behavior:'smooth',block:'start'});},150);}
 function renderWaterAdvice(){
+  const r=computeWaterAdvice();renderDashWaterChip(r);
   const box=document.getElementById('waterAdviceBox');if(!box)return;
-  const r=computeWaterAdvice();
   if(!r){box.innerHTML='<div class="text-[11px] text-slate-500">ยังไม่มีแปลงนา</div>';return;}
-  box.innerHTML=`<div class="flex items-center justify-between gap-2 mb-2"><span class="text-[10px] font-bold text-slate-500 dark:text-slate-400">ผลประเมินวันนี้</span><span class="text-[11px] font-black rounded-full px-3 py-1 ${toneBadgeClass(r.tone)}">${escapeHTML(r.status)}</span></div><ul class="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-700 dark:text-slate-300">${r.reasons.map(t=>`<li>${escapeHTML(t)}</li>`).join('')}</ul>${r.action?`<div class="mt-2 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 p-2 text-[10px] text-sky-900 dark:text-sky-100"><i class="fa-solid fa-ruler-vertical mr-1"></i><b>เป้าหมายระดับน้ำ:</b> ${escapeHTML(r.action)}</div>`:''}<div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-700 space-y-0.5 text-[9px] text-slate-500 dark:text-slate-400">${r.ctx.map(t=>`<div>• ${escapeHTML(t)}</div>`).join('')}</div><p class="mt-2 text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">ประเมินจากข้อมูลที่มีเท่านั้น ไม่ใช่การวัดจริง ตรวจระดับน้ำและสภาพดินในแปลงก่อนตัดสินใจ และตรวจสถานการณ์น้ำในแหล่งน้ำ/ตารางส่งน้ำของพื้นที่ด้วย</p>`;
+  const rest=r.reasons.slice(1);
+  box.innerHTML=`<div class="text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-2">คำตอบวันนี้</div><div class="rounded-xl px-3 py-3 text-center ${toneBadgeClass(r.tone)}"><div class="text-base font-black">${escapeHTML(r.status)}</div></div><div class="text-[11px] leading-relaxed text-slate-700 dark:text-slate-300 mt-2">${escapeHTML(r.reasons[0]||'')}</div>${r.action?`<div class="mt-2 rounded-lg bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 p-2 text-[10px] text-sky-900 dark:text-sky-100"><i class="fa-solid fa-ruler-vertical mr-1"></i><b>เป้าหมายระดับน้ำ:</b> ${escapeHTML(r.action)}</div>`:''}<details class="mt-2"><summary class="cursor-pointer text-[10px] font-bold text-emerald-700 dark:text-emerald-300">ดูรายละเอียด</summary>${rest.length?`<ul class="list-disc pl-4 space-y-1 text-[10px] leading-relaxed text-slate-700 dark:text-slate-300 mt-2">${rest.map(t=>`<li>${escapeHTML(t)}</li>`).join('')}</ul>`:''}<div class="mt-2 pt-2 border-t border-slate-100 dark:border-slate-700 space-y-0.5 text-[9px] text-slate-500 dark:text-slate-400">${r.ctx.map(t=>`<div>• ${escapeHTML(t)}</div>`).join('')}</div></details><p class="mt-2 text-[9px] text-slate-500 dark:text-slate-400 leading-relaxed">ประเมินจากข้อมูลที่มี ไม่ใช่การวัดจริง ตรวจน้ำและดินในแปลงก่อนตัดสินใจ</p>`;
 }
 // Hook into the existing render cycle without touching the original functions.
 const _origRenderLogsV2=renderLogs;
@@ -1140,6 +1163,32 @@ const _origUpdateWeatherSummary=updateWeatherSummary;
 updateWeatherSummary=function(){_origUpdateWeatherSummary();renderWaterAdvice();};
 const _origRenderSatSurfaceV2=renderSatelliteSurfaceData;
 renderSatelliteSurfaceData=function(){_origRenderSatSurfaceV2();renderWaterAdvice();};
+
+// ===== สำรอง / นำเข้าข้อมูล =====
+function exportFarmData(){
+  try{
+    const payload={app:'smart-rice-farm',version:1,exportedAt:new Date().toISOString(),farmData:state};
+    const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='smart-farm-backup-'+dateISO()+'.json';
+    document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+    showMsg('ส่งออกไฟล์สำรองแล้ว');
+  }catch(err){console.error(err);showMsg('ส่งออกไม่สำเร็จ');}
+}
+function importFarmData(e){
+  const file=e.target.files&&e.target.files[0];e.target.value='';if(!file)return;
+  if(file.size>40*1024*1024){showMsg('ไฟล์ใหญ่เกินไป');return;}
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const obj=JSON.parse(reader.result);const data=obj&&obj.farmData?obj.farmData:obj;
+      if(!data||!Array.isArray(data.plots))throw new Error('format');
+      if(!confirm('นำเข้าข้อมูล '+data.plots.length+' แปลง?\n\nข้อมูลแปลงทั้งหมดในบัญชีนี้จะถูกแทนที่ด้วยข้อมูลในไฟล์ (แนะนำให้ส่งออกไฟล์สำรองปัจจุบันก่อน)'))return;
+      state=normalizeState({...data,theme:state.theme});mapNeedsFit=true;mapViewAll=false;save();switchTab('dashboard');showMsg('นำเข้าข้อมูลแล้ว');
+    }catch(err){console.warn(err);showMsg('ไฟล์ไม่ถูกต้อง นำเข้าไม่ได้');}
+  };
+  reader.onerror=()=>showMsg('อ่านไฟล์ไม่สำเร็จ');
+  reader.readAsText(file);
+}
 setAuthMode('login');setupFirebase();
 </script>
 </body>
